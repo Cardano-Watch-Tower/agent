@@ -272,7 +272,31 @@ async function run() {
   }
 }
 
-run().catch(err => {
-  console.error('FATAL:', err);
-  process.exit(1);
-});
+/**
+ * Update internal state after processing a block.
+ * Call this from the orchestrator after scanning.
+ */
+function updateState(block) {
+  lastBlockHash = block.hash;
+  lastBlockHeight = block.height;
+}
+
+// Export for orchestrator use
+module.exports = {
+  checkForNewBlock,
+  scanBlock,
+  analyzeTx,
+  loadState,
+  saveState,
+  updateState,
+  ADA_THRESHOLD,
+  WHALE_THRESHOLD
+};
+
+// Run standalone if called directly
+if (require.main === module) {
+  run().catch(err => {
+    console.error('FATAL:', err);
+    process.exit(1);
+  });
+}
