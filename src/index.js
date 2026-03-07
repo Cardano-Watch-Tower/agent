@@ -20,12 +20,14 @@ const { postTweet, postThread, getMentions, reply, splitForThread, isConfigured 
 const { parseQuery, investigate } = require('./investigator');
 const { createJob, executeJob, formatDelivery, listJobs, STATES } = require('./detective');
 const { detectGovernanceEvents, detectTokenEvents } = require('./detectors');
+const { checkRepos, composeUpdateTweet, initialize: initRepoMonitor } = require('./repo-monitor');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const TEST_MODE = process.argv.includes('--test');
 
 const CHAIN_POLL_MS = 30_000;          // 30 seconds
 const MENTION_POLL_MS = 5 * 60_000;    // 5 minutes
+const REPO_POLL_MS = 30 * 60_000;      // 30 minutes
 const DAILY_DIGEST_HOUR = 0;           // midnight UTC
 
 // Runtime stats for daily digest
@@ -238,6 +240,42 @@ async function dailyDigestLoop() {
   }
 }
 
+// ─── Repo Watch Loop ────────────────────────────────────────
+
+async function repoWatchLoop() {
+  await initRepoMonitor();
+
+  while (true) {
+    try {
+      const updates = await checkRepos();
+
+      for (const update of updates) {
+        console.log(`\n📂 Repo update: ${update.owner}/${update.repo} — ${update.commits.length} new commit(s)`);
+
+        const tweetText = await composeUpdateTweet(update);
+        console.log(`🐦 Repo tweet: ${tweetText}`);
+
+        if (!DRY_RUN && isConfigured()) {
+          try {
+            const tweetId = await postTweet(tweetText);
+            stats.tweetsPosted++;
+            console.log(`✓ Posted repo update tweet ${tweetId}`);
+          } catch (e) {
+            console.error(`✗ Repo tweet failed: ${e.message}`);
+          }
+        } else {
+          console.log('  (dry run — not posted)');
+        }
+      }
+    } catch (e) {
+      console.error(`Repo watch error: ${e.message}`);
+    }
+
+    if (TEST_MODE) break;
+    await sleep(REPO_POLL_MS);
+  }
+}
+
 // ─── Utilities ──────────────────────────────────────────────
 
 function sleep(ms) {
@@ -269,6 +307,7 @@ async function main() {
   Promise.all([
     chainWatchLoop(),
     mentionWatchLoop(),
+    repoWatchLoop(),
     dailyDigestLoop()
   ]).catch(e => {
     console.error('Fatal error:', e);

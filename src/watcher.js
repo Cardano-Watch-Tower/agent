@@ -21,7 +21,7 @@ const path = require('path');
 
 // === CONFIG ===
 const POLL_INTERVAL = 30_000;         // 30 seconds between block checks
-const ADA_THRESHOLD = 1_000_000;      // Alert on movements > 1M ADA
+const ADA_THRESHOLD = 100_000;        // Alert on movements > 100K ADA
 const WHALE_THRESHOLD = 10_000_000;   // Extra attention > 10M ADA
 const STATE_FILE = path.join(__dirname, '..', 'watcher-state.json');
 
