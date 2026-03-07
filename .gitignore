@@ -1,1 +1,4 @@
-node_modules/\n.env\nwatcher-state.json\nalerts/
+node_modules/
+.env
+watcher-state.json
+alerts/
