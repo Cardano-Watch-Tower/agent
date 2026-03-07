@@ -1,0 +1,14 @@
+{
+  "name": "@cardanowatchtower/agent",
+  "version": "0.1.0",
+  "description": "Cardano blockchain monitoring agent — watches large movements, answers queries, reports findings",
+  "main": "src/index.js",
+  "scripts": {
+    "watch": "node src/watcher.js",
+    "test": "node src/watcher.js --test"
+  },
+  "dependencies": {
+    "@blockfrost/blockfrost-js": "^6.0.0",
+    "dotenv": "^17.0.0"
+  }
+}
