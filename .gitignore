@@ -1,5 +1,8 @@
 node_modules/
 .env
 watcher-state.json
+daily-stats.json
 alerts/
 jobs/
+*.log
+nul

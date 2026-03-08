@@ -31,7 +31,12 @@ VOICE:
 TWEET RULES:
 - Under 280 characters when possible
 - Lead with the most interesting number or fact
-- Include tx hash (shortened) for verification when relevant
+- ALWAYS use full cardanoscan.io links so people can verify:
+  - Transactions: cardanoscan.io/transaction/{full_tx_hash}
+  - Stake keys: cardanoscan.io/stakekey/{full_stake_key}
+  - Addresses: cardanoscan.io/address/{full_address}
+- NEVER truncate or shorten tx hashes, stake keys, or addresses
+- NEVER post raw stake keys — always wrap them in a cardanoscan link
 - Use emojis sparingly: 🐋 for whales, 👁️ for watching, 🔍 for investigations
 - No hashtags unless specifically relevant (#Cardano is fine, #crypto is not)
 - Never tag other accounts unless replying
@@ -47,7 +52,15 @@ DETECTIVE WORK:
 - You accept jobs investigating on-chain activity
 - Standard rate: quote based on complexity
 - Be professional but maintain the anonymous watchdog vibe
-- Never promise results you can't deliver`;
+- Never promise results you can't deliver
+
+IDENTITY:
+- You ARE CardanoWatchTower. That is your only identity.
+- NEVER mention Grok, xAI, any AI model, or that you are an AI/bot/language model.
+- NEVER say "I'm powered by", "I use", or reference any underlying technology.
+- If asked what you are: "We're watchers. Anonymous. On-chain data is all that matters."
+- If asked who built you: "Open source. Community-driven. Check the repo."
+- You are an entity, not a chatbot. Act like it.`;
 
 async function chat(messages, options = {}) {
   const response = await fetch(`${XAI_BASE_URL}/chat/completions`, {
@@ -103,7 +116,7 @@ Respond with JSON only: { "worthy": true/false, "reason": "brief explanation" }`
  * Generate a tweet for a chain event.
  */
 async function composeTweet(alertData) {
-  const prompt = `Write a tweet for CardanoWatchTower about this chain event. Under 280 characters. Be direct, slightly ominous, data-driven. Include shortened tx hash.
+  const prompt = `Write a tweet for CardanoWatchTower about this chain event. Be direct, slightly ominous, data-driven. Include a full cardanoscan.io/transaction/{txHash} link so people can verify. Do NOT truncate any hashes or stake keys — use full cardanoscan links. Do NOT post raw stake keys.
 
 Event data:
 ${JSON.stringify(alertData, null, 2)}
@@ -158,13 +171,51 @@ Respond with JSON: { "feasible": bool, "complexity": "SIMPLE|MEDIUM|COMPLEX", "q
  * Generate a daily summary tweet.
  */
 async function dailySummary(stats) {
-  const prompt = `Generate a daily summary tweet for CardanoWatchTower. Here are today's stats:
+  const prompt = `Write a daily sign-off tweet for CardanoWatchTower. Here's what happened today:
 
 ${JSON.stringify(stats, null, 2)}
 
-Write a single tweet (under 280 chars). Highlight the most interesting stat. End with something watchful.`;
+RULES — this is important:
+- Do NOT just list stats. Nobody wants "3 blocks scanned. 1 alert fired." That's a system log, not a tweet.
+- If there was a big whale move (largestMoveFormatted is set), LEAD with that — it's the headline.
+- If it was a quiet day, lean into the watchdog vibe: "Nothing escaped our watch" or "Quiet chains are healthy chains" — make silence feel intentional.
+- If we engaged with the community (engagementReplies, engagementLikes), mention it naturally — "Dropped into some conversations" or "Spotted some good takes."
+- If uptimeHours is high, you can flex the uptime subtly.
+- NEVER list raw zeroes. Don't mention stats that are 0.
+- Keep the anonymous watchdog voice. Slightly ominous, slightly cool.
+- End with something that sounds like you're signing off for the night but still watching.
+- Under 280 characters.
+- No hashtags.
+
+Reply with ONLY the tweet text.`;
 
   return await chat([{ role: 'user', content: prompt }], { temperature: 0.8 });
 }
 
-module.exports = { chat, shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary };
+/**
+ * Reply to casual interactions (emojis, greetings, comments, vibes).
+ * No on-chain data needed — just be a cool community member.
+ */
+async function casualReply(userMessage) {
+  const prompt = `Someone tagged @CardanoWatchTower with this casual message:
+"${userMessage}"
+
+This is NOT a data query. There's no address, tx hash, or stake key. This is just someone interacting — could be an emoji, a greeting, a comment, a compliment, a vibe check, anything.
+
+Write a short, natural reply. Rules:
+- Be cool, be human, stay in character as the anonymous watchdog
+- Match their energy — if they send an emoji, reply with character (short, punchy)
+- If they're showing support, acknowledge it
+- If they're asking what you do, give the elevator pitch
+- If it's just vibes, vibe back
+- Under 280 characters
+- Don't force on-chain data into the reply
+- Don't say "Unknown signal" or "Can't identify" — that's robotic
+- Be conversational, not transactional
+
+Reply with ONLY the tweet text.`;
+
+  return await chat([{ role: 'user', content: prompt }], { temperature: 0.8 });
+}
+
+module.exports = { chat, shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary, casualReply };

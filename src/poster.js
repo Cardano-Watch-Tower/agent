@@ -21,6 +21,7 @@ const config = {
 };
 
 const API_BASE = 'https://api.x.com/2';
+const BOT_USER_ID = '2030350948594536449';
 
 // === OAuth 1.0a Signature ===
 
@@ -229,6 +230,141 @@ function splitForThread(text, maxLen = 275) {
 }
 
 /**
+ * Search recent tweets by query.
+ * Returns array of { id, text, authorId, createdAt }.
+ */
+async function searchTweets(query, maxResults = 10) {
+  const url = `${API_BASE}/tweets/search/recent?query=${encodeURIComponent(query)}&tweet.fields=created_at,author_id,public_metrics,conversation_id&max_results=${maxResults}`;
+  const auth = buildAuthHeader('GET', url);
+
+  const response = await fetch(url, {
+    headers: { 'Authorization': auth }
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Search error ${response.status}: ${err}`);
+  }
+
+  const data = await response.json();
+  if (!data.data) return [];
+
+  return data.data.map(t => ({
+    id: t.id,
+    text: t.text,
+    authorId: t.author_id,
+    createdAt: t.created_at,
+    metrics: t.public_metrics,
+    conversationId: t.conversation_id
+  }));
+}
+
+/**
+ * Like a tweet.
+ */
+async function likeTweet(tweetId) {
+  const userId = BOT_USER_ID;
+  const url = `${API_BASE}/users/${userId}/likes`;
+  const auth = buildAuthHeader('POST', url);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': auth,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ tweet_id: tweetId })
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Like error ${response.status}: ${err}`);
+  }
+
+  return true;
+}
+
+/**
+ * Follow a user by their user ID.
+ */
+async function followUser(targetUserId) {
+  const userId = BOT_USER_ID;
+  const url = `${API_BASE}/users/${userId}/following`;
+  const auth = buildAuthHeader('POST', url);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': auth,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ target_user_id: targetUserId })
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    // 409 = already following, that's fine
+    if (response.status === 409) return true;
+    throw new Error(`Follow error ${response.status}: ${err}`);
+  }
+
+  return true;
+}
+
+/**
+ * Get followers (to follow back).
+ * Returns array of { id, username, name }.
+ */
+async function getFollowers(maxResults = 50) {
+  const userId = BOT_USER_ID;
+  const url = `${API_BASE}/users/${userId}/followers?max_results=${maxResults}&user.fields=username,name,public_metrics`;
+  const auth = buildAuthHeader('GET', url);
+
+  const response = await fetch(url, {
+    headers: { 'Authorization': auth }
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Followers error ${response.status}: ${err}`);
+  }
+
+  const data = await response.json();
+  if (!data.data) return [];
+
+  return data.data.map(u => ({
+    id: u.id,
+    username: u.username,
+    name: u.name,
+    metrics: u.public_metrics
+  }));
+}
+
+/**
+ * Get who the bot is following (to avoid re-following).
+ * Returns array of user IDs.
+ */
+async function getFollowing(maxResults = 100) {
+  const userId = BOT_USER_ID;
+  const url = `${API_BASE}/users/${userId}/following?max_results=${maxResults}`;
+  const auth = buildAuthHeader('GET', url);
+
+  const response = await fetch(url, {
+    headers: { 'Authorization': auth }
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Following error ${response.status}: ${err}`);
+  }
+
+  const data = await response.json();
+  if (!data.data) return [];
+
+  return data.data.map(u => u.id);
+}
+
+/**
  * Check if X API credentials are configured.
  */
 function isConfigured() {
@@ -241,5 +377,11 @@ module.exports = {
   getMentions,
   reply,
   splitForThread,
-  isConfigured
+  isConfigured,
+  searchTweets,
+  likeTweet,
+  followUser,
+  getFollowers,
+  getFollowing,
+  BOT_USER_ID
 };

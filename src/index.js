@@ -1,10 +1,12 @@
 /**
  * CARDANOWATCHTOWER — Main Orchestrator
  *
- * Runs three concurrent loops:
+ * Runs five concurrent loops:
  *   1. Chain Watch   — polls new blocks, detects events, posts alerts
  *   2. Mention Watch — checks @mentions, handles queries + detective requests
- *   3. Daily Digest  — posts daily summary at midnight UTC
+ *   3. Repo Watch    — monitors GitHub repos, tweets about updates
+ *   4. Engagement    — searches Cardano conversations, likes, replies, follows back
+ *   5. Daily Digest  — posts daily summary at midnight UTC
  *
  * Usage:
  *   node src/index.js              — full production mode
@@ -15,12 +17,13 @@ require('dotenv').config();
 
 const { checkForNewBlock, scanBlock, loadState, saveState, updateState } = require('./watcher');
 const { formatTweet, formatAlert, formatAda } = require('./formatter');
-const { shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary } = require('./brain');
+const { shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary, casualReply } = require('./brain');
 const { postTweet, postThread, getMentions, reply, splitForThread, isConfigured } = require('./poster');
 const { parseQuery, investigate } = require('./investigator');
 const { createJob, executeJob, formatDelivery, listJobs, STATES } = require('./detective');
 const { detectGovernanceEvents, detectTokenEvents } = require('./detectors');
 const { checkRepos, composeUpdateTweet, initialize: initRepoMonitor } = require('./repo-monitor');
+const { engage } = require('./engager');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const TEST_MODE = process.argv.includes('--test');
@@ -28,18 +31,61 @@ const TEST_MODE = process.argv.includes('--test');
 const CHAIN_POLL_MS = 30_000;          // 30 seconds
 const MENTION_POLL_MS = 5 * 60_000;    // 5 minutes
 const REPO_POLL_MS = 30 * 60_000;      // 30 minutes
+const ENGAGE_POLL_MS = 15 * 60_000;    // 15 minutes
 const DAILY_DIGEST_HOUR = 0;           // midnight UTC
 
-// Runtime stats for daily digest
+// Runtime stats for daily digest — persisted to disk so restarts don't wipe them
+const fs = require('fs');
+const path = require('path');
+const STATS_FILE = path.join(__dirname, '..', 'daily-stats.json');
+
+function loadStats() {
+  try {
+    if (fs.existsSync(STATS_FILE)) {
+      const saved = JSON.parse(fs.readFileSync(STATS_FILE, 'utf8'));
+      // Always restore lastMentionId (prevents re-replying on restart)
+      if (saved.lastMentionId) {
+        lastMentionId = saved.lastMentionId;
+      }
+      // Only restore counters if same calendar day (UTC)
+      const savedDate = saved.date;
+      const today = new Date().toISOString().split('T')[0];
+      if (savedDate === today) {
+        Object.assign(stats, saved);
+        console.log(`📊 Restored daily stats: ${stats.blocksScanned} blocks, ${stats.alertsGenerated} alerts`);
+      }
+      if (lastMentionId) {
+        console.log(`📬 Restored last mention ID: ${lastMentionId}`);
+      }
+    }
+  } catch (e) { /* fresh start */ }
+}
+
+function saveStats() {
+  try {
+    stats.date = new Date().toISOString().split('T')[0];
+    stats.lastMentionId = lastMentionId;
+    fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
+  } catch (e) { /* ignore */ }
+}
+
 const stats = {
   blocksScanned: 0,
   alertsGenerated: 0,
   tweetsPosted: 0,
   mentionsHandled: 0,
   jobsCreated: 0,
-  startedAt: new Date().toISOString()
+  largestMoveAda: 0,
+  largestMoveTx: null,
+  engagementReplies: 0,
+  engagementLikes: 0,
+  engagementFollows: 0,
+  startedAt: new Date().toISOString(),
+  date: new Date().toISOString().split('T')[0],
+  lastMentionId: null
 };
 
+// lastMentionId lives in stats so it persists across restarts
 let lastMentionId = null;
 
 // ─── Chain Watch Loop ───────────────────────────────────────
@@ -61,6 +107,11 @@ async function chainWatchLoop() {
 
           for (const alert of alerts) {
             stats.alertsGenerated++;
+            // Track largest move of the day
+            if (alert.totalMoved && alert.totalMoved > stats.largestMoveAda) {
+              stats.largestMoveAda = alert.totalMoved;
+              stats.largestMoveTx = alert.txHash;
+            }
             console.log(formatAlert(alert));
 
             // Ask the brain if this is worth tweeting
@@ -89,6 +140,7 @@ async function chainWatchLoop() {
 
         updateState(block);
         saveState();
+        saveStats();
       }
     } catch (e) {
       console.error(`Chain watch error: ${e.message}`);
@@ -114,6 +166,12 @@ async function mentionWatchLoop() {
       const mentions = await getMentions(lastMentionId);
 
       for (const mention of mentions) {
+        // Skip our own tweets — don't reply to yourself
+        if (mention.authorId === '2030350948594536449') {
+          console.log(`  (skipped own tweet: ${mention.text.substring(0, 60)}...)`);
+          continue;
+        }
+
         console.log(`\n📨 Mention from ${mention.authorId}: ${mention.text}`);
         stats.mentionsHandled++;
 
@@ -122,20 +180,24 @@ async function mentionWatchLoop() {
           lastMentionId = mention.id;
         }
 
-        // Determine intent: investigation query or detective hire?
+        // Determine intent: detective request, on-chain query, or casual interaction
         const text = mention.text.replace(/@\w+/g, '').trim();
+        const lower = text.toLowerCase();
 
-        if (text.toLowerCase().includes('investigate') ||
-            text.toLowerCase().includes('hire') ||
-            text.toLowerCase().includes('trace') ||
-            text.toLowerCase().includes('detective')) {
-          // Detective request
+        if (lower.includes('investigate') || lower.includes('hire') ||
+            lower.includes('trace') || lower.includes('detective')) {
           await handleDetectiveRequest(mention, text);
-        } else {
-          // Regular query
+        } else if (parseQuery(text)) {
+          // Has an address, tx hash, or stake key — on-chain query
           await handleQuery(mention, text);
+        } else {
+          // Casual interaction — emoji, greeting, comment, etc.
+          await handleCasual(mention, text);
         }
       }
+
+      // Persist lastMentionId so restarts don't re-reply
+      saveStats();
     } catch (e) {
       console.error(`Mention watch error: ${e.message}`);
     }
@@ -145,20 +207,22 @@ async function mentionWatchLoop() {
   }
 }
 
+async function handleCasual(mention, text) {
+  try {
+    const replyText = await casualReply(text);
+    if (!DRY_RUN) {
+      await reply(mention.id, replyText);
+      stats.tweetsPosted++;
+    }
+    console.log(`  Casual reply: ${replyText}`);
+  } catch (e) {
+    console.error(`  Casual reply error: ${e.message}`);
+  }
+}
+
 async function handleQuery(mention, text) {
   try {
     const parsed = parseQuery(text);
-    if (!parsed) {
-      // Can't parse — ask brain for a generic response
-      const replyText = await respondToQuery(text, { note: 'No address or tx hash found in query' });
-      if (!DRY_RUN) {
-        await reply(mention.id, replyText);
-        stats.tweetsPosted++;
-      }
-      console.log(`  Reply: ${replyText}`);
-      return;
-    }
-
     const data = await investigate(parsed.value);
     const replyText = await respondToQuery(text, data);
 
@@ -216,7 +280,16 @@ async function dailyDigestLoop() {
       lastDigestDate = today;
 
       try {
-        const digestText = await dailySummary(stats);
+        // Compute uptime and enrich stats for the brain
+        const uptimeMs = Date.now() - new Date(stats.startedAt).getTime();
+        const uptimeHours = Math.round(uptimeMs / 3_600_000);
+        const digestContext = {
+          ...stats,
+          uptimeHours,
+          largestMoveFormatted: stats.largestMoveAda > 0 ? formatAda(stats.largestMoveAda) : null
+        };
+
+        const digestText = await dailySummary(digestContext);
         console.log(`\n📊 Daily digest: ${digestText}`);
 
         if (!DRY_RUN && isConfigured()) {
@@ -230,6 +303,13 @@ async function dailyDigestLoop() {
         stats.tweetsPosted = 0;
         stats.mentionsHandled = 0;
         stats.jobsCreated = 0;
+        stats.largestMoveAda = 0;
+        stats.largestMoveTx = null;
+        stats.engagementReplies = 0;
+        stats.engagementLikes = 0;
+        stats.engagementFollows = 0;
+        stats.startedAt = new Date().toISOString();
+        saveStats();
       } catch (e) {
         console.error(`Daily digest error: ${e.message}`);
       }
@@ -276,6 +356,41 @@ async function repoWatchLoop() {
   }
 }
 
+// ─── Community Engagement Loop ─────────────────────────────
+
+async function engagementLoop() {
+  if (!isConfigured()) {
+    console.log('⚠️  X API not configured — engagement disabled');
+    return;
+  }
+
+  // Wait 2 minutes before first engagement cycle (let other loops initialize)
+  await sleep(120_000);
+  console.log('🤝 Community engagement started');
+
+  while (true) {
+    try {
+      if (!DRY_RUN) {
+        const results = await engage();
+        if (results.replied > 0 || results.liked > 0 || results.followed > 0) {
+          console.log(`\n🤝 Engagement: ${results.searched} found, ${results.replied} replies, ${results.liked} likes, ${results.followed} follows`);
+          stats.tweetsPosted += results.replied;
+          stats.engagementReplies += results.replied;
+          stats.engagementLikes += results.liked;
+          stats.engagementFollows += results.followed;
+        }
+      } else {
+        console.log('  (dry run — engagement skipped)');
+      }
+    } catch (e) {
+      console.error(`Engagement error: ${e.message}`);
+    }
+
+    if (TEST_MODE) break;
+    await sleep(ENGAGE_POLL_MS);
+  }
+}
+
 // ─── Utilities ──────────────────────────────────────────────
 
 function sleep(ms) {
@@ -296,6 +411,9 @@ async function main() {
 ╚══════════════════════════════════════════════╝
 `);
 
+  // Restore stats from disk (survives restarts)
+  loadStats();
+
   if (TEST_MODE) {
     console.log('Running single test pass...\n');
     await chainWatchLoop();
@@ -308,6 +426,7 @@ async function main() {
     chainWatchLoop(),
     mentionWatchLoop(),
     repoWatchLoop(),
+    engagementLoop(),
     dailyDigestLoop()
   ]).catch(e => {
     console.error('Fatal error:', e);

@@ -12,6 +12,17 @@
  *   - Stay under 280 chars for X posts
  */
 
+function txLink(hash) {
+  if (!hash) return '???';
+  return `cardanoscan.io/transaction/${hash}`;
+}
+
+function stakeLink(stakeKey) {
+  if (!stakeKey) return 'unknown';
+  return `cardanoscan.io/stakekey/${stakeKey}`;
+}
+
+// Keep short versions for console logging only
 function shortenHash(hash) {
   if (!hash) return '???';
   return hash.substring(0, 8) + '...' + hash.substring(hash.length - 6);
@@ -70,9 +81,8 @@ function formatTweet(alert) {
     }
   }
 
-  // TX reference
-  lines.push(`\ntx: ${hash}`);
-  lines.push(`block: ${alert.blockHeight}`);
+  // TX reference — full cardanoscan link so people can verify
+  lines.push(`\n${txLink(alert.txHash)}`);
 
   return lines.join('\n');
 }
@@ -126,4 +136,4 @@ function formatAlert(alert) {
   return lines.join('\n');
 }
 
-module.exports = { formatAlert, formatTweet, formatAda, shortenHash };
+module.exports = { formatAlert, formatTweet, formatAda, shortenHash, txLink, stakeLink };
