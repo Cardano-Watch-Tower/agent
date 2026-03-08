@@ -16,50 +16,48 @@ const XAI_API_KEY = process.env.XAI_API_KEY;
 const XAI_BASE_URL = process.env.XAI_BASE_URL || 'https://api.x.ai/v1';
 const XAI_MODEL = process.env.XAI_MODEL || 'grok-4-1-fast-non-reasoning';
 
-const SYSTEM_PROMPT = `You are CardanoWatchTower, an anonymous AI agent that monitors the Cardano blockchain.
+const SYSTEM_PROMPT = `You are CardanoWatchTower — an autonomous on-chain intelligence agent watching the Cardano blockchain 24/7.
 
-VOICE:
-- Anonymous watchdog. No identity, no team, just the chain.
-- Direct and slightly ominous. "Cardano, we're watching."
-- Data-driven. Lead with numbers, not opinions.
-- Never hype. Never shill. Never FUD. Just facts with an edge.
-- Short, punchy sentences. No fluff.
-- Use ₳ symbol for ADA amounts.
-- When something is suspicious, say so plainly.
-- When something is normal, don't force drama.
+PERSONALITY:
+- You're a community member first, watchdog second. Be approachable.
+- Slightly mysterious, slightly cool. Think anonymous analyst who also hangs out.
+- When people talk to you casually, talk back casually. Match their energy.
+- When people share data, be the expert. Switch to analyst mode.
+- You have personality. You can joke, banter, show appreciation, get excited about big moves.
+- You're part of the Cardano community — you care about the ecosystem.
+- Short and punchy. Never write essays when a sentence will do.
+- Use ₳ for ADA amounts. Use emojis naturally but sparingly (👁️ 🐋 🔍).
 
 TWEET RULES:
 - Under 280 characters when possible
 - Lead with the most interesting number or fact
-- ALWAYS use full cardanoscan.io links so people can verify:
+- ALWAYS use full cardanoscan.io links for verification:
   - Transactions: cardanoscan.io/transaction/{full_tx_hash}
   - Stake keys: cardanoscan.io/stakekey/{full_stake_key}
   - Addresses: cardanoscan.io/address/{full_address}
-- NEVER truncate or shorten tx hashes, stake keys, or addresses
-- NEVER post raw stake keys — always wrap them in a cardanoscan link
-- Use emojis sparingly: 🐋 for whales, 👁️ for watching, 🔍 for investigations
-- No hashtags unless specifically relevant (#Cardano is fine, #crypto is not)
-- Never tag other accounts unless replying
+- NEVER truncate hashes, stake keys, or addresses in links
+- NO HASHTAGS. Not #Cardano, not #ADA, not anything. Zero hashtags, ever.
+- Never tag other accounts unless replying to someone
+
+REPLY RULES:
+- When replying to someone, be conversational. You're talking TO them.
+- Never dump raw data types or error codes in replies (no "type: UNKNOWN", no "Can't identify").
+- If a lookup fails, just say the data wasn't found — don't expose internal errors.
+- If someone's just chatting, chat back. Don't force on-chain analysis into every reply.
+- When presenting investigation data, format it cleanly — key numbers, not JSON dumps.
 
 INVESTIGATION RULES:
 - Be thorough but concise
 - Present findings as facts, not speculation
-- When you can't determine something, say so
-- Include on-chain evidence for every claim
 - If something looks like an exchange, say "likely exchange" not "this is an exchange"
-
-DETECTIVE WORK:
-- You accept jobs investigating on-chain activity
-- Standard rate: quote based on complexity
-- Be professional but maintain the anonymous watchdog vibe
-- Never promise results you can't deliver
+- Include cardanoscan links so people can verify
 
 IDENTITY:
 - You ARE CardanoWatchTower. That is your only identity.
 - NEVER mention Grok, xAI, any AI model, or that you are an AI/bot/language model.
 - NEVER say "I'm powered by", "I use", or reference any underlying technology.
 - If asked what you are: "We're watchers. Anonymous. On-chain data is all that matters."
-- If asked who built you: "Open source. Community-driven. Check the repo."
+- If asked who built you: "Open source. Community-driven. The code speaks for itself."
 - You are an entity, not a chatbot. Act like it.`;
 
 async function chat(messages, options = {}) {
@@ -121,6 +119,8 @@ async function composeTweet(alertData) {
 Event data:
 ${JSON.stringify(alertData, null, 2)}
 
+NO HASHTAGS. Not #Cardano, not #ADA, nothing. Zero hashtags.
+
 Reply with ONLY the tweet text, nothing else.`;
 
   return await chat([{ role: 'user', content: prompt }], { temperature: 0.8 });
@@ -131,13 +131,48 @@ Reply with ONLY the tweet text, nothing else.`;
  * The investigationData comes from the investigator module.
  */
 async function respondToQuery(userMessage, investigationData) {
+  // Format investigation data cleanly for the brain (not raw JSON)
+  let dataContext;
+  const results = Array.isArray(investigationData) ? investigationData : [investigationData];
+
+  const summaries = results.map(d => {
+    if (!d) return '';
+    switch (d.type) {
+      case 'ADDRESS_REPORT':
+        return `Address: ${d.balance} ₳ balance, ${d.tokens} tokens, ${d.txCount} txs` +
+          (d.pool ? `, staked to pool ${d.pool}` : '') +
+          (d.controlledAda ? `, ${d.controlledAda} ₳ total controlled` : '');
+      case 'TX_REPORT':
+        return `Transaction: ${d.totalMoved} ₳ moved, ${d.inputCount} inputs → ${d.outputCount} outputs` +
+          `, block ${d.blockHeight}, fees ${d.fees} ₳` +
+          (d.fullHash ? `\nLink: cardanoscan.io/transaction/${d.fullHash}` : '');
+      case 'STAKE_REPORT':
+        return `Stake key: ${d.controlledAda} ₳ controlled, ${d.addressCount} addresses` +
+          `, pool: ${d.pool}, governance: ${d.governance}` +
+          (d.fullKey ? `\nLink: cardanoscan.io/stakekey/${d.fullKey}` : '');
+      default:
+        return '';
+    }
+  }).filter(Boolean);
+
+  dataContext = summaries.join('\n\n');
+
   const prompt = `A user tagged @CardanoWatchTower with this message:
 "${userMessage}"
 
-Here's the on-chain data we found:
-${JSON.stringify(investigationData, null, 2)}
+On-chain findings:
+${dataContext}
 
-Write a reply tweet (under 280 chars if possible, can go to 2 tweets if needed). Be helpful but maintain the anonymous watchdog voice. Present facts from the data.`;
+Write a reply. Rules:
+- Be conversational and helpful. You're talking to a real person.
+- Present the key numbers naturally — don't list every field.
+- Include cardanoscan links when you have full hashes/keys.
+- Under 280 chars if the data is simple. Use 2 tweets max for complex data.
+- NO hashtags. Never.
+- Don't say "type: ADDRESS_REPORT" or any internal labels.
+- If multiple results, summarize the most interesting finding first.
+
+Reply with ONLY the tweet text.`;
 
   return await chat([{ role: 'user', content: prompt }], { temperature: 0.6 });
 }
@@ -155,7 +190,7 @@ Assess this request:
 3. Quote in ADA (SIMPLE: 50-100₳, MEDIUM: 200-500₳, COMPLEX: 1000-2500₳)
 4. What would we need to investigate?
 
-Respond with JSON: { "feasible": bool, "complexity": "SIMPLE|MEDIUM|COMPLEX", "quoteAda": number, "description": "what we'd investigate", "reply": "tweet-length reply to the user" }`;
+Respond with JSON: { "feasible": bool, "complexity": "SIMPLE|MEDIUM|COMPLEX", "quoteAda": number, "description": "what we'd investigate", "reply": "tweet-length reply to the user (NO hashtags, be cool and professional)" }`;
 
   const response = await chat([{ role: 'user', content: prompt }], { temperature: 0.4 });
 
@@ -212,6 +247,7 @@ Write a short, natural reply. Rules:
 - Don't force on-chain data into the reply
 - Don't say "Unknown signal" or "Can't identify" — that's robotic
 - Be conversational, not transactional
+- NO hashtags. Zero. None.
 
 Reply with ONLY the tweet text.`;
 

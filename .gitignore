@@ -6,3 +6,6 @@ alerts/
 jobs/
 *.log
 nul
+.chrome-profile/
+.cookies.json
+screenshots/

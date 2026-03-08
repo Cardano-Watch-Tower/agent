@@ -1,205 +1,410 @@
 /**
- * POSTER — X (Twitter) integration for CardanoWatchTower
+ * POSTER — Browser-based X posting for CardanoWatchTower
+ *
+ * No API. No OAuth. No dev account. No tier fees.
+ * Just a browser typing and clicking like any user.
  *
  * Handles:
- *   - Posting tweets (alerts, investigation results, daily summaries)
- *   - Posting tweet threads (long investigation reports)
- *   - Reading mentions (user queries and detective requests)
- *   - Replying to mentions
- *
- * Uses OAuth 1.0a for user-context authentication.
- * X API v2 endpoints.
+ *   - Posting tweets (compose box → type → click post)
+ *   - Posting threads (reply to own tweets)
+ *   - Reading mentions (notifications page scrape)
+ *   - Replying to tweets (navigate → reply)
+ *   - Liking tweets
+ *   - Following users
  */
-require('dotenv').config();
-const crypto = require('crypto');
+const browser = require('./browser');
 
-const config = {
-  apiKey: process.env.X_API_KEY,
-  apiSecret: process.env.X_API_SECRET,
-  accessToken: process.env.X_ACCESS_TOKEN,
-  accessTokenSecret: process.env.X_ACCESS_TOKEN_SECRET
-};
+const BOT_USERNAME = process.env.X_USERNAME || 'CardanoWT';
 
-const API_BASE = 'https://api.x.com/2';
-const BOT_USER_ID = '2030350948594536449';
-
-// === OAuth 1.0a Signature ===
-
-function percentEncode(str) {
-  return encodeURIComponent(str)
-    .replace(/!/g, '%21')
-    .replace(/\*/g, '%2A')
-    .replace(/'/g, '%27')
-    .replace(/\(/g, '%28')
-    .replace(/\)/g, '%29');
-}
-
-function generateNonce() {
-  return crypto.randomBytes(16).toString('hex');
-}
-
-function generateSignature(method, url, params, consumerSecret, tokenSecret) {
-  const sortedParams = Object.keys(params).sort().map(k =>
-    `${percentEncode(k)}=${percentEncode(params[k])}`
-  ).join('&');
-
-  const baseString = [
-    method.toUpperCase(),
-    percentEncode(url),
-    percentEncode(sortedParams)
-  ].join('&');
-
-  const signingKey = `${percentEncode(consumerSecret)}&${percentEncode(tokenSecret)}`;
-  return crypto.createHmac('sha1', signingKey).update(baseString).digest('base64');
-}
-
-function buildAuthHeader(method, fullUrl, extraParams = {}) {
-  // Split URL and query params — OAuth requires query params in signature
-  const [baseUrl, queryString] = fullUrl.split('?');
-  const queryParams = {};
-  if (queryString) {
-    for (const pair of queryString.split('&')) {
-      const [k, v] = pair.split('=');
-      queryParams[decodeURIComponent(k)] = decodeURIComponent(v || '');
-    }
-  }
-
-  const oauthParams = {
-    oauth_consumer_key: config.apiKey,
-    oauth_nonce: generateNonce(),
-    oauth_signature_method: 'HMAC-SHA1',
-    oauth_timestamp: Math.floor(Date.now() / 1000).toString(),
-    oauth_token: config.accessToken,
-    oauth_version: '1.0'
-  };
-
-  const allParams = { ...oauthParams, ...queryParams, ...extraParams };
-  const signature = generateSignature(method, baseUrl, allParams, config.apiSecret, config.accessTokenSecret);
-  oauthParams.oauth_signature = signature;
-
-  const header = 'OAuth ' + Object.keys(oauthParams).sort().map(k =>
-    `${percentEncode(k)}="${percentEncode(oauthParams[k])}"`
-  ).join(', ');
-
-  return header;
-}
-
-// === API Methods ===
+// === Posting ===
 
 /**
- * Post a single tweet.
- * Returns the tweet ID on success.
+ * Post a single tweet via browser.
+ * Navigates to compose, types, clicks post.
+ * Returns the tweet URL or null.
  */
 async function postTweet(text, replyToId = null) {
-  const url = `${API_BASE}/tweets`;
-  const body = { text };
+  const page = await browser.getPage();
+
   if (replyToId) {
-    body.reply = { in_reply_to_tweet_id: replyToId };
+    // Navigate to the tweet and reply
+    return await replyToTweet(replyToId, text);
   }
 
-  const authHeader = buildAuthHeader('POST', url);
+  // Navigate to home (compose box is there)
+  await browser.goto('https://x.com/home');
+  await browser.sleep(2000);
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': authHeader,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
+  // Click the compose area
+  try {
+    const composeSelector = '[data-testid="tweetTextarea_0"]';
+    await page.waitForSelector(composeSelector, { timeout: 10000 });
+    await page.click(composeSelector);
+    await browser.sleep(500);
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`X API error ${response.status}: ${err}`);
+    // Type the tweet with human-like delays
+    await page.keyboard.type(text, { delay: 20 + Math.random() * 30 });
+    await browser.sleep(1000);
+
+    // Click the post button
+    const postButton = await page.waitForSelector('[data-testid="tweetButtonInline"]', { timeout: 5000 });
+    await postButton.click();
+    await browser.sleep(3000);
+
+    // Save cookies after posting
+    await browser.saveCookies();
+
+    console.log(`✓ Posted tweet: ${text.substring(0, 80)}...`);
+    return true;
+  } catch (e) {
+    console.error(`✗ Post failed: ${e.message}`);
+    await browser.screenshot('post-failed');
+    throw e;
   }
+}
 
-  const data = await response.json();
-  return data.data.id;
+/**
+ * Reply to a specific tweet by navigating to it.
+ *
+ * X's tweet detail pages hang with networkidle2 in headless mode (continuous
+ * background requests prevent idle). Use domcontentloaded + explicit waits
+ * for the React content to hydrate.
+ */
+async function replyToTweet(tweetId, text) {
+  const page = await browser.getPage();
+
+  // If tweetId is a URL, go directly. Otherwise construct URL.
+  const url = tweetId.startsWith('http') ? tweetId :
+    `https://x.com/i/status/${tweetId}`;
+
+  // Use 'load' instead of 'networkidle2' — tweet detail pages never go idle
+  await page.goto(url, { waitUntil: 'load', timeout: 30000 });
+  await browser.sleep(5000); // Give React time to hydrate
+
+  try {
+    const replySelector = '[data-testid="tweetTextarea_0"]';
+
+    // Check if reply box is already visible (it is on tweet detail pages when logged in)
+    let replyBox = await page.$(replySelector);
+
+    if (!replyBox) {
+      // Reply box not visible — try clicking the reply icon on the tweet to open it
+      console.log('  Reply box not visible — clicking reply icon...');
+      const replyIcon = await page.$('[data-testid="reply"]');
+      if (replyIcon) {
+        await replyIcon.click();
+        await browser.sleep(2000);
+      }
+    }
+
+    // Now wait for the textarea (either inline or in modal)
+    await page.waitForSelector(replySelector, { timeout: 15000 });
+    await page.click(replySelector);
+    await browser.sleep(500);
+
+    // Type reply
+    await page.keyboard.type(text, { delay: 20 + Math.random() * 30 });
+    await browser.sleep(1000);
+
+    // Click reply/post button — could be inline or in a modal
+    let postButton = await page.$('[data-testid="tweetButtonInline"]');
+    if (!postButton) {
+      postButton = await page.$('[data-testid="tweetButton"]');
+    }
+    if (postButton) {
+      await postButton.click();
+    } else {
+      throw new Error('Could not find post/reply button');
+    }
+
+    await browser.sleep(3000);
+    await browser.saveCookies();
+    console.log(`✓ Replied to ${tweetId}: ${text.substring(0, 80)}...`);
+    return true;
+  } catch (e) {
+    console.error(`✗ Reply failed: ${e.message}`);
+    await browser.screenshot('reply-failed');
+    throw e;
+  }
 }
 
 /**
  * Post a thread (array of tweet texts).
- * Each tweet replies to the previous one.
- * Returns array of tweet IDs.
+ * Posts first tweet, then replies to each in chain.
  */
 async function postThread(tweets) {
-  const ids = [];
-  let previousId = null;
+  if (tweets.length === 0) return [];
 
-  for (const text of tweets) {
-    const id = await postTweet(text, previousId);
-    ids.push(id);
-    previousId = id;
-    // Small delay between tweets to avoid rate limits
-    await new Promise(r => setTimeout(r, 1000));
+  // Post first tweet
+  await postTweet(tweets[0]);
+  await browser.sleep(2000);
+
+  // Navigate to our profile to find the tweet we just posted
+  const page = await browser.getPage();
+  await browser.goto(`https://x.com/${BOT_USERNAME}`);
+  await browser.sleep(3000);
+
+  // Get the first tweet link from our profile
+  const firstTweetLink = await page.evaluate(() => {
+    const tweets = document.querySelectorAll('article[data-testid="tweet"]');
+    if (tweets.length > 0) {
+      const link = tweets[0].querySelector('a[href*="/status/"]');
+      return link ? link.href : null;
+    }
+    return null;
+  });
+
+  if (!firstTweetLink) {
+    console.log('⚠️  Could not find posted tweet to thread');
+    return [true];
   }
 
-  return ids;
+  // Reply chain for remaining tweets
+  const results = [true];
+  let lastTweetUrl = firstTweetLink;
+
+  for (let i = 1; i < tweets.length; i++) {
+    await browser.sleep(2000);
+    await replyToTweet(lastTweetUrl, tweets[i]);
+    results.push(true);
+
+    // After replying, the new reply should be on our profile
+    // For now, continue replying to the same thread URL
+    // X shows all replies in the thread view
+  }
+
+  return results;
 }
 
 /**
- * Get recent mentions of @CardanoWatchTower.
- * Returns array of { id, text, authorId, createdAt }.
+ * Get recent mentions by scraping notifications.
+ * Returns array of { id, text, authorUsername, authorName }.
  */
-async function getMentions(sinceId = null) {
-  // Need the bot's user ID first
-  const meUrl = `${API_BASE}/users/me`;
-  const meAuth = buildAuthHeader('GET', meUrl);
+async function getMentions(lastSeenText = null) {
+  const page = await browser.getPage();
 
-  const meResponse = await fetch(meUrl, {
-    headers: { 'Authorization': meAuth }
-  });
+  await browser.goto('https://x.com/notifications/mentions');
+  await browser.sleep(3000);
 
-  if (!meResponse.ok) {
-    throw new Error(`Failed to get user ID: ${meResponse.status}`);
-  }
+  const mentions = await page.evaluate((lastSeen) => {
+    const results = [];
+    const articles = document.querySelectorAll('article[data-testid="tweet"]');
 
-  const meData = await meResponse.json();
-  const userId = meData.data.id;
+    for (const article of articles) {
+      const textEl = article.querySelector('[data-testid="tweetText"]');
+      const text = textEl ? textEl.textContent : '';
 
-  // Get mentions
-  let mentionsUrl = `${API_BASE}/users/${userId}/mentions?tweet.fields=created_at,author_id&max_results=10`;
-  if (sinceId) mentionsUrl += `&since_id=${sinceId}`;
+      // Stop if we hit the last seen mention
+      if (lastSeen && text.includes(lastSeen)) break;
 
-  const mentionsAuth = buildAuthHeader('GET', mentionsUrl);
+      // Get author info
+      const userLinks = article.querySelectorAll('a[href^="/"]');
+      let authorUsername = '';
+      let authorName = '';
+      for (const link of userLinks) {
+        const href = link.getAttribute('href');
+        if (href && href.match(/^\/[a-zA-Z0-9_]+$/) && !href.includes('/status/')) {
+          authorUsername = href.substring(1);
+          authorName = link.textContent || authorUsername;
+          break;
+        }
+      }
 
-  const response = await fetch(mentionsUrl, {
-    headers: { 'Authorization': mentionsAuth }
-  });
+      // Get tweet link for the ID
+      const statusLink = article.querySelector('a[href*="/status/"]');
+      const tweetUrl = statusLink ? statusLink.href : '';
+      const tweetId = tweetUrl.match(/\/status\/(\d+)/)?.[1] || '';
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Mentions error ${response.status}: ${err}`);
-  }
+      // Get timestamp
+      const timeEl = article.querySelector('time');
+      const createdAt = timeEl ? timeEl.getAttribute('datetime') : '';
 
-  const data = await response.json();
-  if (!data.data) return [];
+      if (text && authorUsername) {
+        results.push({
+          id: tweetId,
+          text,
+          authorUsername,
+          authorName,
+          createdAt,
+          url: tweetUrl
+        });
+      }
+    }
 
-  return data.data.map(t => ({
-    id: t.id,
-    text: t.text,
-    authorId: t.author_id,
-    createdAt: t.created_at
-  }));
+    return results;
+  }, lastSeenText);
+
+  await browser.saveCookies();
+  return mentions;
 }
 
 /**
- * Reply to a tweet.
+ * Reply to a tweet (alias for replyToTweet).
  */
 async function reply(tweetId, text) {
-  return postTweet(text, tweetId);
+  return replyToTweet(tweetId, text);
+}
+
+/**
+ * Like a tweet by navigating to it and clicking the heart.
+ */
+async function likeTweet(tweetIdOrUrl) {
+  const page = await browser.getPage();
+  const url = tweetIdOrUrl.startsWith('http') ? tweetIdOrUrl :
+    `https://x.com/i/status/${tweetIdOrUrl}`;
+
+  await browser.goto(url);
+  await browser.sleep(2000);
+
+  try {
+    const likeButton = await page.waitForSelector('[data-testid="like"]', { timeout: 5000 });
+    await likeButton.click();
+    await browser.sleep(1000);
+    return true;
+  } catch (e) {
+    // Already liked or button not found
+    return false;
+  }
+}
+
+/**
+ * Follow a user by navigating to their profile.
+ */
+async function followUser(username) {
+  const page = await browser.getPage();
+  await browser.goto(`https://x.com/${username}`);
+  await browser.sleep(2000);
+
+  try {
+    // Look for Follow button (not Following — that means already followed)
+    const followButton = await page.evaluate(() => {
+      const buttons = document.querySelectorAll('[data-testid$="-follow"]');
+      for (const btn of buttons) {
+        if (btn.getAttribute('data-testid') === `${btn.getAttribute('data-testid')}` &&
+            !btn.textContent.includes('Following')) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (followButton) {
+      const btn = await page.$('[data-testid$="-follow"]');
+      if (btn) {
+        await btn.click();
+        await browser.sleep(1000);
+        return true;
+      }
+    }
+    return false; // Already following
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Search tweets by navigating to X search.
+ * Returns array of { text, authorUsername, tweetUrl, metrics }.
+ */
+async function searchTweets(query, maxResults = 10) {
+  const page = await browser.getPage();
+  const searchUrl = `https://x.com/search?q=${encodeURIComponent(query)}&f=live`;
+
+  await browser.goto(searchUrl);
+  await browser.sleep(3000);
+
+  const tweets = await page.evaluate((max) => {
+    const results = [];
+    const articles = document.querySelectorAll('article[data-testid="tweet"]');
+
+    for (const article of articles) {
+      if (results.length >= max) break;
+
+      const textEl = article.querySelector('[data-testid="tweetText"]');
+      const text = textEl ? textEl.textContent : '';
+      if (!text) continue;
+
+      // Author
+      const userLinks = article.querySelectorAll('a[href^="/"]');
+      let authorUsername = '';
+      for (const link of userLinks) {
+        const href = link.getAttribute('href');
+        if (href && href.match(/^\/[a-zA-Z0-9_]+$/) && !href.includes('/status/')) {
+          authorUsername = href.substring(1);
+          break;
+        }
+      }
+
+      // Tweet URL
+      const statusLink = article.querySelector('a[href*="/status/"]');
+      const tweetUrl = statusLink ? statusLink.href : '';
+      const tweetId = tweetUrl.match(/\/status\/(\d+)/)?.[1] || '';
+
+      // Metrics (approximate from displayed numbers)
+      const metricsEls = article.querySelectorAll('[data-testid$="count"]');
+      const metrics = {};
+
+      results.push({
+        id: tweetId,
+        text,
+        authorUsername,
+        url: tweetUrl,
+        metrics
+      });
+    }
+
+    return results;
+  }, maxResults);
+
+  return tweets;
+}
+
+/**
+ * Get followers from the followers page.
+ */
+async function getFollowers(maxResults = 50) {
+  const page = await browser.getPage();
+  await browser.goto(`https://x.com/${BOT_USERNAME}/followers`);
+  await browser.sleep(3000);
+
+  const followers = await page.evaluate((max) => {
+    const results = [];
+    const cells = document.querySelectorAll('[data-testid="UserCell"]');
+
+    for (const cell of cells) {
+      if (results.length >= max) break;
+
+      const links = cell.querySelectorAll('a[href^="/"]');
+      let username = '';
+      let name = '';
+      for (const link of links) {
+        const href = link.getAttribute('href');
+        if (href && href.match(/^\/[a-zA-Z0-9_]+$/)) {
+          username = href.substring(1);
+          name = link.textContent || username;
+          break;
+        }
+      }
+
+      if (username) {
+        results.push({ username, name });
+      }
+    }
+
+    return results;
+  }, maxResults);
+
+  return followers;
 }
 
 /**
  * Split long text into tweet-sized chunks for threading.
- * Tries to break at sentence boundaries.
  */
 function splitForThread(text, maxLen = 275) {
   if (text.length <= maxLen) return [text];
 
   const tweets = [];
   let remaining = text;
-  let index = 1;
 
   while (remaining.length > 0) {
     if (remaining.length <= maxLen) {
@@ -207,7 +412,6 @@ function splitForThread(text, maxLen = 275) {
       break;
     }
 
-    // Try to break at a period or newline
     let breakPoint = maxLen;
     const periodIdx = remaining.lastIndexOf('. ', maxLen);
     const newlineIdx = remaining.lastIndexOf('\n', maxLen);
@@ -218,10 +422,8 @@ function splitForThread(text, maxLen = 275) {
     const chunk = remaining.substring(0, breakPoint).trim();
     tweets.push(chunk);
     remaining = remaining.substring(breakPoint).trim();
-    index++;
   }
 
-  // Add thread numbering if > 2 tweets
   if (tweets.length > 2) {
     return tweets.map((t, i) => `${i + 1}/${tweets.length} ${t}`);
   }
@@ -230,145 +432,14 @@ function splitForThread(text, maxLen = 275) {
 }
 
 /**
- * Search recent tweets by query.
- * Returns array of { id, text, authorId, createdAt }.
+ * Check if browser is ready and logged in.
  */
-async function searchTweets(query, maxResults = 10) {
-  const url = `${API_BASE}/tweets/search/recent?query=${encodeURIComponent(query)}&tweet.fields=created_at,author_id,public_metrics,conversation_id&max_results=${maxResults}`;
-  const auth = buildAuthHeader('GET', url);
-
-  const response = await fetch(url, {
-    headers: { 'Authorization': auth }
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Search error ${response.status}: ${err}`);
+async function isConfigured() {
+  try {
+    return await browser.isLoggedIn();
+  } catch (e) {
+    return false;
   }
-
-  const data = await response.json();
-  if (!data.data) return [];
-
-  return data.data.map(t => ({
-    id: t.id,
-    text: t.text,
-    authorId: t.author_id,
-    createdAt: t.created_at,
-    metrics: t.public_metrics,
-    conversationId: t.conversation_id
-  }));
-}
-
-/**
- * Like a tweet.
- */
-async function likeTweet(tweetId) {
-  const userId = BOT_USER_ID;
-  const url = `${API_BASE}/users/${userId}/likes`;
-  const auth = buildAuthHeader('POST', url);
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': auth,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ tweet_id: tweetId })
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Like error ${response.status}: ${err}`);
-  }
-
-  return true;
-}
-
-/**
- * Follow a user by their user ID.
- */
-async function followUser(targetUserId) {
-  const userId = BOT_USER_ID;
-  const url = `${API_BASE}/users/${userId}/following`;
-  const auth = buildAuthHeader('POST', url);
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': auth,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ target_user_id: targetUserId })
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    // 409 = already following, that's fine
-    if (response.status === 409) return true;
-    throw new Error(`Follow error ${response.status}: ${err}`);
-  }
-
-  return true;
-}
-
-/**
- * Get followers (to follow back).
- * Returns array of { id, username, name }.
- */
-async function getFollowers(maxResults = 50) {
-  const userId = BOT_USER_ID;
-  const url = `${API_BASE}/users/${userId}/followers?max_results=${maxResults}&user.fields=username,name,public_metrics`;
-  const auth = buildAuthHeader('GET', url);
-
-  const response = await fetch(url, {
-    headers: { 'Authorization': auth }
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Followers error ${response.status}: ${err}`);
-  }
-
-  const data = await response.json();
-  if (!data.data) return [];
-
-  return data.data.map(u => ({
-    id: u.id,
-    username: u.username,
-    name: u.name,
-    metrics: u.public_metrics
-  }));
-}
-
-/**
- * Get who the bot is following (to avoid re-following).
- * Returns array of user IDs.
- */
-async function getFollowing(maxResults = 100) {
-  const userId = BOT_USER_ID;
-  const url = `${API_BASE}/users/${userId}/following?max_results=${maxResults}`;
-  const auth = buildAuthHeader('GET', url);
-
-  const response = await fetch(url, {
-    headers: { 'Authorization': auth }
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Following error ${response.status}: ${err}`);
-  }
-
-  const data = await response.json();
-  if (!data.data) return [];
-
-  return data.data.map(u => u.id);
-}
-
-/**
- * Check if X API credentials are configured.
- */
-function isConfigured() {
-  return !!(config.apiKey && config.apiSecret && config.accessToken && config.accessTokenSecret);
 }
 
 module.exports = {
@@ -382,6 +453,5 @@ module.exports = {
   likeTweet,
   followUser,
   getFollowers,
-  getFollowing,
-  BOT_USER_ID
+  BOT_USERNAME
 };

@@ -10,5 +10,8 @@
   "dependencies": {
     "@blockfrost/blockfrost-js": "^6.0.0",
     "dotenv": "^17.0.0"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.38.0"
   }
 }

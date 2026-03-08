@@ -18,12 +18,14 @@ require('dotenv').config();
 const { checkForNewBlock, scanBlock, loadState, saveState, updateState } = require('./watcher');
 const { formatTweet, formatAlert, formatAda } = require('./formatter');
 const { shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary, casualReply } = require('./brain');
-const { postTweet, postThread, getMentions, reply, splitForThread, isConfigured } = require('./poster');
-const { parseQuery, investigate } = require('./investigator');
+const { postTweet, postThread, getMentions, reply, splitForThread, isConfigured, BOT_USERNAME } = require('./poster');
+const { parseQuery, investigate, investigateAddress, investigateTx, investigateStake } = require('./investigator');
 const { createJob, executeJob, formatDelivery, listJobs, STATES } = require('./detective');
 const { detectGovernanceEvents, detectTokenEvents } = require('./detectors');
 const { checkRepos, composeUpdateTweet, initialize: initRepoMonitor } = require('./repo-monitor');
 const { engage } = require('./engager');
+const { detectPromise, addFollowUp, getPendingFollowUps, markProcessing, markDelivered, markFailed, cleanup: cleanupFollowUps } = require('./followups');
+const browser = require('./browser');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const TEST_MODE = process.argv.includes('--test');
@@ -32,6 +34,7 @@ const CHAIN_POLL_MS = 30_000;          // 30 seconds
 const MENTION_POLL_MS = 5 * 60_000;    // 5 minutes
 const REPO_POLL_MS = 30 * 60_000;      // 30 minutes
 const ENGAGE_POLL_MS = 15 * 60_000;    // 15 minutes
+const FOLLOWUP_POLL_MS = 2 * 60_000;   // 2 minutes — check for pending follow-ups
 const DAILY_DIGEST_HOUR = 0;           // midnight UTC
 
 // Runtime stats for daily digest — persisted to disk so restarts don't wipe them
@@ -154,11 +157,6 @@ async function chainWatchLoop() {
 // ─── Mention Watch Loop ─────────────────────────────────────
 
 async function mentionWatchLoop() {
-  if (!isConfigured()) {
-    console.log('⚠️  X API not configured — mention watching disabled');
-    return;
-  }
-
   console.log('📬 Mention watch started');
 
   while (true) {
@@ -167,12 +165,13 @@ async function mentionWatchLoop() {
 
       for (const mention of mentions) {
         // Skip our own tweets — don't reply to yourself
-        if (mention.authorId === '2030350948594536449') {
+        const mentionAuthor = (mention.authorUsername || '').toLowerCase();
+        if (mentionAuthor === BOT_USERNAME.toLowerCase()) {
           console.log(`  (skipped own tweet: ${mention.text.substring(0, 60)}...)`);
           continue;
         }
 
-        console.log(`\n📨 Mention from ${mention.authorId}: ${mention.text}`);
+        console.log(`\n📨 Mention from @${mention.authorUsername}: ${mention.text}`);
         stats.mentionsHandled++;
 
         // Update last seen
@@ -215,6 +214,9 @@ async function handleCasual(mention, text) {
       stats.tweetsPosted++;
     }
     console.log(`  Casual reply: ${replyText}`);
+
+    // Check if our reply made a promise we need to deliver on
+    checkForPromise(mention, text, replyText);
   } catch (e) {
     console.error(`  Casual reply error: ${e.message}`);
   }
@@ -223,7 +225,36 @@ async function handleCasual(mention, text) {
 async function handleQuery(mention, text) {
   try {
     const parsed = parseQuery(text);
-    const data = await investigate(parsed.value);
+    if (!parsed) return; // safety — shouldn't happen since we check before calling
+
+    // Build list of queries (single or multi)
+    const queries = parsed.multi ? [...parsed] : [parsed];
+    const results = [];
+
+    for (const q of queries) {
+      try {
+        let data;
+        switch (q.type) {
+          case 'address': data = await investigateAddress(q.value); break;
+          case 'tx': data = await investigateTx(q.value); break;
+          case 'stake': data = await investigateStake(q.value); break;
+          default: continue;
+        }
+        if (data) results.push(data);
+      } catch (e) {
+        console.error(`  Failed ${q.type} lookup: ${e.message}`);
+      }
+    }
+
+    if (results.length === 0) {
+      // All lookups failed — reply gracefully
+      const fallback = await casualReply(`${text}\n(They shared some on-chain data but lookups failed — be helpful, suggest trying again)`);
+      if (!DRY_RUN) await reply(mention.id, fallback);
+      return;
+    }
+
+    // Pass single result or array to brain
+    const data = results.length === 1 ? results[0] : results;
     const replyText = await respondToQuery(text, data);
 
     // Split if too long
@@ -232,7 +263,6 @@ async function handleQuery(mention, text) {
       if (tweets.length === 1) {
         await reply(mention.id, tweets[0]);
       } else {
-        // First tweet replies to mention, rest chain
         let prevId = mention.id;
         for (const t of tweets) {
           prevId = await postTweet(t, prevId);
@@ -242,6 +272,9 @@ async function handleQuery(mention, text) {
       stats.tweetsPosted += tweets.length;
     }
     console.log(`  Reply (${tweets.length} tweets): ${tweets[0]?.substring(0, 80)}...`);
+
+    // Check if our reply promised a deeper follow-up
+    checkForPromise(mention, text, replyText);
   } catch (e) {
     console.error(`  Query handling error: ${e.message}`);
   }
@@ -359,11 +392,6 @@ async function repoWatchLoop() {
 // ─── Community Engagement Loop ─────────────────────────────
 
 async function engagementLoop() {
-  if (!isConfigured()) {
-    console.log('⚠️  X API not configured — engagement disabled');
-    return;
-  }
-
   // Wait 2 minutes before first engagement cycle (let other loops initialize)
   await sleep(120_000);
   console.log('🤝 Community engagement started');
@@ -391,6 +419,106 @@ async function engagementLoop() {
   }
 }
 
+// ─── Follow-Up Accountability ──────────────────────────────
+
+/**
+ * After we reply to someone, check if our reply promised to do something.
+ * If it did, and we can figure out WHAT to investigate, queue a follow-up.
+ */
+function checkForPromise(mention, originalText, ourReply) {
+  const promise = detectPromise(ourReply);
+  if (!promise) return;
+
+  // Try to extract something investigatable from the original message
+  const parsed = parseQuery(originalText);
+  const queryType = parsed ? parsed.type : null;
+  const queryValue = parsed ? parsed.value : null;
+
+  addFollowUp({
+    tweetId: mention.id,
+    username: mention.authorUsername || 'unknown',
+    originalText,
+    promiseText: promise,
+    queryType,
+    queryValue
+  });
+}
+
+/**
+ * Process pending follow-ups: investigate what we promised, reply with results.
+ */
+async function followUpLoop() {
+  // Wait 3 minutes before starting (let other loops stabilize)
+  await sleep(180_000);
+  console.log('📌 Follow-up processor started');
+
+  while (true) {
+    try {
+      const pending = getPendingFollowUps();
+
+      for (const followUp of pending) {
+        console.log(`\n📌 Processing follow-up ${followUp.id} for @${followUp.username}`);
+        markProcessing(followUp.id);
+
+        try {
+          let result = null;
+          let replyText = null;
+
+          // If we know what to investigate, do it
+          if (followUp.queryType && followUp.queryValue) {
+            switch (followUp.queryType) {
+              case 'address': result = await investigateAddress(followUp.queryValue); break;
+              case 'tx': result = await investigateTx(followUp.queryValue); break;
+              case 'stake': result = await investigateStake(followUp.queryValue); break;
+            }
+
+            if (result) {
+              // Use the brain to format a follow-up reply
+              replyText = await respondToQuery(
+                `[FOLLOW-UP] @${followUp.username} asked: ${followUp.originalText}\n\nYou previously said you'd look into it. Now deliver the actual findings.`,
+                result
+              );
+            }
+          }
+
+          // If no specific query or investigation failed, generate a generic follow-up
+          if (!replyText) {
+            replyText = await casualReply(
+              `[FOLLOW-UP] @${followUp.username} asked: ${followUp.originalText}\n\n` +
+              `You promised "${followUp.promiseText}" but couldn't find specific on-chain data. ` +
+              `Give a helpful follow-up — acknowledge you checked, share what you found (or didn't), ` +
+              `and offer to help if they share a specific address/tx/stake key.`
+            );
+          }
+
+          if (replyText && !DRY_RUN) {
+            const tweets = splitForThread(replyText);
+            await reply(followUp.tweetId, tweets[0]);
+            stats.tweetsPosted++;
+            markDelivered(followUp.id);
+          } else if (DRY_RUN) {
+            console.log(`  [DRY RUN] Would reply: ${replyText?.substring(0, 100)}...`);
+            markDelivered(followUp.id);
+          }
+        } catch (e) {
+          markFailed(followUp.id, e.message);
+        }
+
+        // Don't hammer X — wait between follow-ups
+        await sleep(30_000);
+      }
+
+      // Weekly cleanup of old entries
+      cleanupFollowUps();
+    } catch (e) {
+      console.error(`Follow-up loop error: ${e.message}`);
+    }
+
+    if (TEST_MODE) break;
+    await sleep(FOLLOWUP_POLL_MS);
+  }
+}
+
 // ─── Utilities ──────────────────────────────────────────────
 
 function sleep(ms) {
@@ -400,16 +528,32 @@ function sleep(ms) {
 // ─── Startup ────────────────────────────────────────────────
 
 async function main() {
+  // Initialize browser and check X login status
+  let xReady = false;
+  try {
+    await browser.launch();
+    xReady = await browser.isLoggedIn();
+  } catch (e) {
+    console.error(`Browser init failed: ${e.message}`);
+  }
+
   console.log(`
 ╔══════════════════════════════════════════════╗
 ║         CARDANO WATCH TOWER  👁️              ║
 ║         We're watching.                      ║
 ╠══════════════════════════════════════════════╣
 ║  Mode: ${DRY_RUN ? 'DRY RUN' : TEST_MODE ? 'TEST   ' : 'LIVE   '}                              ║
-║  X API: ${isConfigured() ? '✓ Connected' : '✗ Not configured'}                       ║
+║  X:    ${xReady ? '✓ Logged in (browser)' : '✗ Not logged in'}              ║
+║  Brain: xAI Grok (direct)                   ║
 ║  Chain: Cardano mainnet                      ║
+║  Follow-ups: ${String(getPendingFollowUps().length).padEnd(3)} pending                      ║
 ╚══════════════════════════════════════════════╝
 `);
+
+  if (!xReady && !DRY_RUN && !TEST_MODE) {
+    console.log('⚠️  Not logged into X. Run: node src/login.js');
+    console.log('   Once logged in, cookies persist across restarts.\n');
+  }
 
   // Restore stats from disk (survives restarts)
   loadStats();
@@ -418,8 +562,17 @@ async function main() {
     console.log('Running single test pass...\n');
     await chainWatchLoop();
     console.log('\n--- Test complete ---');
+    await browser.close();
     process.exit(0);
   }
+
+  // Graceful shutdown
+  process.on('SIGINT', async () => {
+    console.log('\nShutting down...');
+    saveStats();
+    await browser.close();
+    process.exit(0);
+  });
 
   // Run all loops concurrently
   Promise.all([
@@ -427,9 +580,11 @@ async function main() {
     mentionWatchLoop(),
     repoWatchLoop(),
     engagementLoop(),
-    dailyDigestLoop()
-  ]).catch(e => {
+    dailyDigestLoop(),
+    followUpLoop()
+  ]).catch(async e => {
     console.error('Fatal error:', e);
+    await browser.close();
     process.exit(1);
   });
 }

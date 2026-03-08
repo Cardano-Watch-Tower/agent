@@ -18,26 +18,57 @@ const { formatAda, shortenHash } = require('./formatter');
  * Detect what kind of query the user sent.
  * Returns: { type: 'address'|'tx'|'stake'|'pool'|'unknown', value: string }
  */
+/**
+ * Extract blockchain identifiers from user input.
+ * Returns null if no blockchain data is found (= casual message).
+ * Returns array of { type, value } for all found identifiers.
+ * Single match returns one object for backward compat.
+ */
 function parseQuery(input) {
   const cleaned = input.trim();
+  const found = [];
 
-  if (cleaned.startsWith('addr1') || cleaned.startsWith('addr_')) {
-    return { type: 'address', value: cleaned };
-  }
-  if (cleaned.startsWith('Ae2') || cleaned.startsWith('Ddz')) {
-    return { type: 'address', value: cleaned };
-  }
-  if (cleaned.startsWith('stake1') || cleaned.startsWith('stake_')) {
-    return { type: 'stake', value: cleaned };
-  }
-  if (cleaned.startsWith('pool1')) {
-    return { type: 'pool', value: cleaned };
-  }
-  if (/^[a-f0-9]{64}$/.test(cleaned)) {
-    return { type: 'tx', value: cleaned };
+  // Extract all addresses (addr1...)
+  const addrMatches = cleaned.match(/\b(addr1[a-z0-9]{50,}|addr_[a-z0-9]{50,})\b/gi);
+  if (addrMatches) {
+    for (const m of addrMatches) found.push({ type: 'address', value: m });
   }
 
-  return { type: 'unknown', value: cleaned };
+  // Byron-era addresses
+  const byronMatches = cleaned.match(/\b(Ae2[a-zA-Z0-9]{50,}|Ddz[a-zA-Z0-9]{50,})\b/g);
+  if (byronMatches) {
+    for (const m of byronMatches) found.push({ type: 'address', value: m });
+  }
+
+  // Extract all stake keys
+  const stakeMatches = cleaned.match(/\b(stake1[a-z0-9]{40,}|stake_[a-z0-9]{40,})\b/gi);
+  if (stakeMatches) {
+    for (const m of stakeMatches) found.push({ type: 'stake', value: m });
+  }
+
+  // Extract all pool IDs
+  const poolMatches = cleaned.match(/\b(pool1[a-z0-9]{40,})\b/gi);
+  if (poolMatches) {
+    for (const m of poolMatches) found.push({ type: 'pool', value: m });
+  }
+
+  // Extract all tx hashes (64-char hex strings)
+  const txMatches = cleaned.match(/\b([a-f0-9]{64})\b/gi);
+  if (txMatches) {
+    for (const m of txMatches) found.push({ type: 'tx', value: m.toLowerCase() });
+  }
+
+  // Nothing found = casual message, return null
+  if (found.length === 0) return null;
+
+  // Single match — return it directly (backward compat)
+  if (found.length === 1) return found[0];
+
+  // Multiple matches — return array with .type and .value from first for compat
+  found.type = found[0].type;
+  found.value = found[0].value;
+  found.multi = true;
+  return found;
 }
 
 /**
@@ -231,6 +262,8 @@ function formatReport(result) {
 async function investigate(input) {
   const query = parseQuery(input);
 
+  if (!query) return null;
+
   switch (query.type) {
     case 'address':
       return await investigateAddress(query.value);
@@ -241,8 +274,8 @@ async function investigate(input) {
     case 'pool':
       return { type: 'POOL_REPORT', message: 'Pool investigation coming soon' };
     default:
-      return { type: 'UNKNOWN', message: `Can't identify: ${query.value.substring(0, 30)}` };
+      return null;
   }
 }
 
-module.exports = { investigate, formatReport, parseQuery };
+module.exports = { investigate, investigateAddress, investigateTx, investigateStake, formatReport, parseQuery };
