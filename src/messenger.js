@@ -25,6 +25,10 @@ const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || 'tcl@therefreshcnft.com';
 const MESSAGES_DIR = process.env.MESSAGES_DIR || path.join(__dirname, '..', 'messages');
 
 const INBOX_DIR = path.join(MESSAGES_DIR, 'inbox');
+
+// Report frequency: 'hourly' or 'daily'
+let reportInterval = process.env.REPORT_INTERVAL || 'hourly';
+let lastReportHour = -1;
 const OUTBOX_DIR = path.join(MESSAGES_DIR, 'outbox');
 const ARCHIVE_DIR = path.join(MESSAGES_DIR, 'archive');
 
@@ -242,6 +246,47 @@ HEALTH
   console.log(`📊 Daily report sent for ${date}`);
 }
 
+
+
+async function hourlyReport(stats) {
+  const now = new Date();
+  const hour = now.getUTCHours();
+
+  // Skip if we already sent this hour
+  if (hour === lastReportHour) return false;
+  if (reportInterval !== 'hourly') return false;
+
+  lastReportHour = hour;
+  const timestamp = now.toISOString();
+  const uptime = stats.startedAt
+    ? Math.round((Date.now() - new Date(stats.startedAt).getTime()) / 60000) + 'min'
+    : 'unknown';
+
+  const body = `CWT Hourly Status — ${timestamp.split('T')[0]} ${String(hour).padStart(2,'0')}:00 UTC
+
+Uptime: ${uptime}
+Blocks: ${stats.blocksScanned || 0} | Alerts: ${stats.alertsGenerated || 0}
+Tweets: ${stats.tweetsPosted || 0} | Mentions: ${stats.mentionsHandled || 0}
+Engagement: ${stats.engagementReplies || 0}R ${stats.engagementLikes || 0}L ${stats.engagementFollows || 0}F
+Errors: ${stats.consecutiveErrors || 0}
+Inbox: ${checkInbox().length} | Outbox: ${fs.readdirSync(OUTBOX_DIR).filter(f => f.endsWith('.json')).length}
+
+All systems nominal.`;
+
+  await sendEmailToOwner(`Hourly Status — ${String(hour).padStart(2,'0')}:00 UTC`, body);
+  console.log(`📊 Hourly report sent (${hour}:00 UTC)`);
+  return true;
+}
+
+function setReportInterval(interval) {
+  if (['hourly', 'daily', 'off'].includes(interval)) {
+    reportInterval = interval;
+    console.log(`📊 Report interval set to: ${interval}`);
+    return true;
+  }
+  return false;
+}
+
 // ─── Design Request/Notification Processing ─────────────────
 
 function requestDesign(template, data, options = {}) {
@@ -364,6 +409,8 @@ module.exports = {
 
   // Reports
   dailyReport,
+  hourlyReport,
+  setReportInterval,
 
   // Designer integration
   requestDesign,

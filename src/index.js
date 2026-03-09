@@ -550,6 +550,8 @@ async function messengerLoop() {
         console.log('📨 Processed ' + processed + ' message(s)');
       }
       stats.consecutiveErrors = 0;
+      // Hourly report check
+      await messenger.hourlyReport(stats);
     } catch (e) {
       stats.consecutiveErrors++;
       console.error('Messenger loop error: ' + e.message);
