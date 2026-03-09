@@ -11,28 +11,121 @@
  *   - Replying to tweets (navigate → reply)
  *   - Liking tweets
  *   - Following users
+ *   - Attaching images to tweets and replies
  */
 const browser = require('./browser');
+const { withLock } = browser;
+const fs = require('fs');
+const path = require('path');
 
 const BOT_USERNAME = process.env.X_USERNAME || 'CardanoWT';
+
+// === Image Attachment ===
+
+/**
+ * Attach an image to the current compose/reply box.
+ * Call AFTER text is typed but BEFORE clicking post/reply.
+ *
+ * @param {object} page - Puppeteer page object
+ * @param {string} imagePath - Absolute path to image file
+ * @returns {boolean} true if image was attached, false if skipped
+ */
+async function attachImage(page, imagePath) {
+  if (!imagePath) return false;
+
+  // Check file exists
+  if (!fs.existsSync(imagePath)) {
+    console.log(`⚠️  Image not found: ${imagePath} — posting without image`);
+    return false;
+  }
+
+  try {
+    // Primary selector: X's stable test ID for file input
+    let fileInput = await page.$('input[data-testid="fileInput"]');
+
+    if (!fileInput) {
+      // Fallback: click the media button to inject file input into DOM
+      const mediaButton = await page.$('[data-testid="tweetMediaButton"]');
+      if (mediaButton) {
+        await mediaButton.click();
+        await browser.sleep(1000);
+        fileInput = await page.$('input[data-testid="fileInput"]');
+      }
+    }
+
+    if (!fileInput) {
+      // Last resort: generic file input
+      fileInput = await page.$('input[type="file"][accept*="image"]');
+    }
+
+    if (!fileInput) {
+      console.log('⚠️  Could not find file input — posting without image');
+      return false;
+    }
+
+    // Upload the file
+    await fileInput.uploadFile(imagePath);
+
+    // Wait for image preview to confirm upload succeeded
+    const previewSelector = '[data-testid="attachments"]';
+    try {
+      await page.waitForSelector(previewSelector, { timeout: 8000 });
+      console.log(`📎 Image attached: ${path.basename(imagePath)}`);
+      return true;
+    } catch (e) {
+      // Preview didn't appear — retry once
+      console.log('⚠️  Image preview not detected — retrying upload...');
+      await browser.sleep(1000);
+      await fileInput.uploadFile(imagePath);
+      try {
+        await page.waitForSelector(previewSelector, { timeout: 8000 });
+        console.log(`📎 Image attached (retry): ${path.basename(imagePath)}`);
+        return true;
+      } catch (e2) {
+        console.log('⚠️  Image upload failed after retry — posting without image');
+        await browser.screenshot('image-upload-failed');
+        return false;
+      }
+    }
+  } catch (e) {
+    console.log(`⚠️  Image attachment error: ${e.message} — posting without image`);
+    return false;
+  }
+}
 
 // === Posting ===
 
 /**
  * Post a single tweet via browser.
  * Navigates to compose, types, clicks post.
- * Returns the tweet URL or null.
+ *
+ * @param {string} text - Tweet text
+ * @param {object|string|null} options - Either:
+ *   - string: treated as replyToId (backward compat)
+ *   - object: { replyToId, imagePath }
+ *   - null: simple tweet
+ * @returns {boolean} true on success
  */
-async function postTweet(text, replyToId = null) {
-  const page = await browser.getPage();
+async function postTweet(text, options = null) {
+  // Backward compat: if options is a string, it's a replyToId
+  let replyToId = null;
+  let imagePath = null;
 
-  if (replyToId) {
-    // Navigate to the tweet and reply
-    return await replyToTweet(replyToId, text);
+  if (typeof options === 'string') {
+    replyToId = options;
+  } else if (options && typeof options === 'object') {
+    replyToId = options.replyToId || null;
+    imagePath = options.imagePath || null;
   }
 
+  if (replyToId) {
+    return await replyToTweet(replyToId, text, imagePath);
+  }
+
+  const page = await browser.getPage();
+
   // Navigate to home (compose box is there)
-  await browser.goto('https://x.com/home');
+  await browser.goto('https://x.com/home', 'domcontentloaded');
   await browser.sleep(2000);
 
   // Click the compose area
@@ -46,15 +139,26 @@ async function postTweet(text, replyToId = null) {
     await page.keyboard.type(text, { delay: 20 + Math.random() * 30 });
     await browser.sleep(1000);
 
+    // Attach image if provided (after typing, before posting)
+    if (imagePath) {
+      await attachImage(page, imagePath);
+      await browser.sleep(1000);
+    }
+
     // Click the post button
     const postButton = await page.waitForSelector('[data-testid="tweetButtonInline"]', { timeout: 5000 });
+    await page.evaluate(() => {
+      const b = document.querySelector('[data-testid="tweetButtonInline"]');
+      if (b) b.scrollIntoView({ block: 'center' });
+    });
+    await browser.sleep(300);
     await postButton.click();
     await browser.sleep(3000);
 
     // Save cookies after posting
     await browser.saveCookies();
 
-    console.log(`✓ Posted tweet: ${text.substring(0, 80)}...`);
+    console.log(`✓ Posted tweet${imagePath ? ' (with image)' : ''}: ${text.substring(0, 80)}...`);
     return true;
   } catch (e) {
     console.error(`✗ Post failed: ${e.message}`);
@@ -67,11 +171,18 @@ async function postTweet(text, replyToId = null) {
  * Reply to a specific tweet by navigating to it.
  *
  * X's tweet detail pages hang with networkidle2 in headless mode (continuous
- * background requests prevent idle). Use domcontentloaded + explicit waits
+ * background requests prevent idle). Use load + explicit waits
  * for the React content to hydrate.
+ *
+ * @param {string} tweetId - Tweet ID or full URL
+ * @param {string} text - Reply text
+ * @param {string|null} imagePath - Optional image to attach
  */
-async function replyToTweet(tweetId, text) {
+async function replyToTweet(tweetId, text, imagePath = null) {
   const page = await browser.getPage();
+
+  // Ensure viewport is tall enough for reply UI
+  await page.setViewport({ width: 1280, height: 1800 });
 
   // If tweetId is a URL, go directly. Otherwise construct URL.
   const url = tweetId.startsWith('http') ? tweetId :
@@ -88,7 +199,6 @@ async function replyToTweet(tweetId, text) {
     let replyBox = await page.$(replySelector);
 
     if (!replyBox) {
-      // Reply box not visible — try clicking the reply icon on the tweet to open it
       console.log('  Reply box not visible — clicking reply icon...');
       const replyIcon = await page.$('[data-testid="reply"]');
       if (replyIcon) {
@@ -97,29 +207,64 @@ async function replyToTweet(tweetId, text) {
       }
     }
 
-    // Now wait for the textarea (either inline or in modal)
+    // Wait for textarea, scroll it into view, then click
     await page.waitForSelector(replySelector, { timeout: 15000 });
+    await page.evaluate((sel) => {
+      const el = document.querySelector(sel);
+      if (el) el.scrollIntoView({ block: 'center' });
+    }, replySelector);
+    await browser.sleep(300);
     await page.click(replySelector);
     await browser.sleep(500);
+
+    // Clear any stale text from previous failed attempts
+    await page.keyboard.down('Control');
+    await page.keyboard.press('a');
+    await page.keyboard.up('Control');
+    await page.keyboard.press('Backspace');
+    await browser.sleep(300);
 
     // Type reply
     await page.keyboard.type(text, { delay: 20 + Math.random() * 30 });
     await browser.sleep(1000);
 
-    // Click reply/post button — could be inline or in a modal
+    // Attach image if provided
+    if (imagePath) {
+      await attachImage(page, imagePath);
+      await browser.sleep(1000);
+    }
+
+    // Find reply button — try both selectors
     let postButton = await page.$('[data-testid="tweetButtonInline"]');
     if (!postButton) {
       postButton = await page.$('[data-testid="tweetButton"]');
     }
-    if (postButton) {
-      await postButton.click();
-    } else {
+    if (!postButton) {
       throw new Error('Could not find post/reply button');
     }
 
-    await browser.sleep(3000);
+    // Check if button is enabled (text might be too long)
+    const btnDisabled = await page.evaluate(() => {
+      const b = document.querySelector('[data-testid="tweetButtonInline"]') ||
+                document.querySelector('[data-testid="tweetButton"]');
+      return b && (b.disabled || b.getAttribute('aria-disabled') === 'true');
+    });
+    if (btnDisabled) {
+      throw new Error('Reply button disabled — text may exceed character limit');
+    }
+
+    // Scroll button into view and click
+    await page.evaluate(() => {
+      const b = document.querySelector('[data-testid="tweetButtonInline"]') ||
+                document.querySelector('[data-testid="tweetButton"]');
+      if (b) b.scrollIntoView({ block: 'center' });
+    });
+    await browser.sleep(300);
+    await postButton.click();
+
+    await browser.sleep(5000);
     await browser.saveCookies();
-    console.log(`✓ Replied to ${tweetId}: ${text.substring(0, 80)}...`);
+    console.log(`✓ Replied to ${tweetId}${imagePath ? ' (with image)' : ''}: ${text.substring(0, 80)}...`);
     return true;
   } catch (e) {
     console.error(`✗ Reply failed: ${e.message}`);
@@ -129,14 +274,21 @@ async function replyToTweet(tweetId, text) {
 }
 
 /**
- * Post a thread (array of tweet texts).
+ * Post a thread (array of tweet texts or {text, imagePath} objects).
  * Posts first tweet, then replies to each in chain.
+ *
+ * @param {Array<string|{text: string, imagePath?: string}>} tweets
  */
 async function postThread(tweets) {
   if (tweets.length === 0) return [];
 
+  // Normalize: convert strings to objects
+  const normalized = tweets.map(t =>
+    typeof t === 'string' ? { text: t, imagePath: null } : t
+  );
+
   // Post first tweet
-  await postTweet(tweets[0]);
+  await postTweet(normalized[0].text, { imagePath: normalized[0].imagePath });
   await browser.sleep(2000);
 
   // Navigate to our profile to find the tweet we just posted
@@ -163,14 +315,10 @@ async function postThread(tweets) {
   const results = [true];
   let lastTweetUrl = firstTweetLink;
 
-  for (let i = 1; i < tweets.length; i++) {
+  for (let i = 1; i < normalized.length; i++) {
     await browser.sleep(2000);
-    await replyToTweet(lastTweetUrl, tweets[i]);
+    await replyToTweet(lastTweetUrl, normalized[i].text, normalized[i].imagePath);
     results.push(true);
-
-    // After replying, the new reply should be on our profile
-    // For now, continue replying to the same thread URL
-    // X shows all replies in the thread view
   }
 
   return results;
@@ -180,22 +328,19 @@ async function postThread(tweets) {
  * Get recent mentions by scraping notifications.
  * Returns array of { id, text, authorUsername, authorName }.
  */
-async function getMentions(lastSeenText = null) {
+async function getMentions(lastSeenId = null) {
   const page = await browser.getPage();
 
   await browser.goto('https://x.com/notifications/mentions');
   await browser.sleep(3000);
 
-  const mentions = await page.evaluate((lastSeen) => {
+  const mentions = await page.evaluate((lastSeenId) => {
     const results = [];
     const articles = document.querySelectorAll('article[data-testid="tweet"]');
 
     for (const article of articles) {
       const textEl = article.querySelector('[data-testid="tweetText"]');
       const text = textEl ? textEl.textContent : '';
-
-      // Stop if we hit the last seen mention
-      if (lastSeen && text.includes(lastSeen)) break;
 
       // Get author info
       const userLinks = article.querySelectorAll('a[href^="/"]');
@@ -232,7 +377,13 @@ async function getMentions(lastSeenText = null) {
     }
 
     return results;
-  }, lastSeenText);
+  }, lastSeenId);
+
+  // Filter out mentions we already processed (by ID comparison)
+  if (lastSeenId) {
+    const lastBig = BigInt(lastSeenId);
+    return mentions.filter(m => m.id && BigInt(m.id) > lastBig);
+  }
 
   await browser.saveCookies();
   return mentions;
@@ -442,16 +593,19 @@ async function isConfigured() {
   }
 }
 
+// Wrap browser-using functions with lock to prevent concurrent Chrome navigation
 module.exports = {
-  postTweet,
-  postThread,
-  getMentions,
-  reply,
+  postTweet: (...args) => withLock(() => postTweet(...args)),
+  postThread: (...args) => withLock(() => postThread(...args)),
+  getMentions: (...args) => withLock(() => getMentions(...args)),
+  reply: (...args) => withLock(() => reply(...args)),
+  replyToTweet: (...args) => withLock(() => replyToTweet(...args)),
   splitForThread,
   isConfigured,
-  searchTweets,
-  likeTweet,
-  followUser,
-  getFollowers,
+  searchTweets: (...args) => withLock(() => searchTweets(...args)),
+  likeTweet: (...args) => withLock(() => likeTweet(...args)),
+  followUser: (...args) => withLock(() => followUser(...args)),
+  getFollowers: (...args) => withLock(() => getFollowers(...args)),
+  attachImage,
   BOT_USERNAME
 };
