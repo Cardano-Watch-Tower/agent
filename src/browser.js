@@ -13,7 +13,7 @@
  *   - Element waiting and interaction
  *   - Screenshot capture for debugging
  */
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const { execFileSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -35,6 +35,23 @@ let page = null;
 let launchPromise = null; // Dedup concurrent launch() calls
 let lastLoginAttempt = 0; // Cooldown: don't hammer X with login attempts
 const LOGIN_COOLDOWN_MS = 120_000; // 2 minutes between login attempts
+
+// Browser operation lock - prevents concurrent Chrome navigation crashes
+let _lockQueue = Promise.resolve();
+
+function withLock(fn) {
+  const prev = _lockQueue;
+  let resolve;
+  _lockQueue = new Promise(r => resolve = r);
+  return (async () => {
+    await prev;
+    try {
+      return await fn();
+    } finally {
+      resolve();
+    }
+  })();
+}
 
 /**
  * Delete all Chrome lock/state files from profile dir.
@@ -60,7 +77,7 @@ function killOrphanedChrome() {
   // Nuclear option: kill ALL chrome.exe — the wmic commandline query misses
   // freshly-spawned headless Chrome that hasn't registered yet.
   try {
-    execFileSync('taskkill', ['/F', '/IM', 'chrome.exe'], { stdio: 'ignore' });
+    execFileSync('pkill', ['-f', 'chrome'], { stdio: 'ignore' });
     console.log('🧹 Killed all Chrome processes');
   } catch (e) {
     // No chrome running — that's fine
@@ -68,7 +85,7 @@ function killOrphanedChrome() {
 
   // Wait for OS to release file handles (sync sleep via ping)
   try {
-    execFileSync('ping', ['-n', '4', '127.0.0.1'], { stdio: 'ignore' });
+    execFileSync('sleep', ['3'], { stdio: 'ignore' });
   } catch (e) { /* ignore */ }
 
   // Delete ALL lock artifacts Chrome uses
@@ -150,6 +167,7 @@ async function _doLaunch() {
       '--window-size=1920,1080',
       '--disable-extensions',
       '--disable-gpu',
+      '--disable-dev-shm-usage',
       '--lang=en-US'
     ],
     defaultViewport: { width: 1920, height: 1080 }
@@ -248,7 +266,17 @@ async function loadCookies() {
  */
 async function goto(url, waitFor = 'networkidle2') {
   await launch();
-  await page.goto(url, { waitUntil: waitFor, timeout: 30000 });
+  try {
+    await page.goto(url, { waitUntil: waitFor, timeout: 30000 });
+  } catch (e) {
+    if (e.message.includes('ERR_ABORTED') || e.message.includes('net::ERR_')) {
+      console.log('⟳ Navigation retry (' + url.substring(0, 40) + ')');
+      await sleep(2000);
+      await page.goto(url, { waitUntil: waitFor, timeout: 30000 });
+    } else {
+      throw e;
+    }
+  }
   await saveCookies();
   return page;
 }
@@ -426,5 +454,5 @@ module.exports = {
   launch, goto, isLoggedIn, login,
   humanType, click, waitFor, getText,
   screenshot, getPage, close,
-  saveCookies, loadCookies, sleep
+  saveCookies, loadCookies, sleep, withLock
 };

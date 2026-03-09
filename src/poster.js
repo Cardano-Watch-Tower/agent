@@ -122,11 +122,19 @@ async function postTweet(text, options = null) {
     return await replyToTweet(replyToId, text, imagePath);
   }
 
+  // Fresh Chrome — kill stale X JS, restore cookies, clean slate
+  await browser.close();
   const page = await browser.getPage();
 
-  // Navigate to home (compose box is there)
+  // Navigate to home
   await browser.goto('https://x.com/home', 'domcontentloaded');
   await browser.sleep(2000);
+
+  // Verify still logged in
+  const currentUrl = page.url();
+  if (currentUrl.includes('/login') || currentUrl.includes('/i/flow/login')) {
+    throw new Error('X session expired — not logged in');
+  }
 
   // Click the compose area
   try {
@@ -179,6 +187,8 @@ async function postTweet(text, options = null) {
  * @param {string|null} imagePath - Optional image to attach
  */
 async function replyToTweet(tweetId, text, imagePath = null) {
+  // Fresh Chrome — kill stale X JS, restore cookies, clean slate
+  await browser.close();
   const page = await browser.getPage();
 
   // Ensure viewport is tall enough for reply UI
