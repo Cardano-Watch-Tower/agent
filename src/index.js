@@ -1,7 +1,7 @@
 /**
  * CARDANOWATCHTOWER — Main Orchestrator
  *
- * Runs seven concurrent loops:
+ * Runs eight concurrent loops:
  *   1. Chain Watch   — polls new blocks, detects events, posts alerts
  *   2. Mention Watch — checks @mentions, handles queries + detective requests
  *   3. Repo Watch    — monitors GitHub repos, tweets about updates
@@ -9,6 +9,7 @@
  *   5. Daily Digest  — posts daily summary at midnight UTC
  *   6. Follow-Up     — delivers promised follow-up replies
  *   7. Messenger     — checks inbox, processes inter-agent messages
+ *   8. Analyst       — monitors error patterns, X safety circuit breaker
  *
  * Usage:
  *   node src/index.js              — full production mode
@@ -29,6 +30,7 @@ const { engage } = require('./engager');
 const { detectPromise, addFollowUp, getPendingFollowUps, markProcessing, markDelivered, markFailed, cleanup: cleanupFollowUps } = require('./followups');
 const browser = require('./browser');
 const messenger = require('./messenger');
+const analyst = require('./analyst');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const TEST_MODE = process.argv.includes('--test');
@@ -39,6 +41,7 @@ const REPO_POLL_MS = 30 * 60_000;      // 30 minutes
 const ENGAGE_POLL_MS = 15 * 60_000;    // 15 minutes
 const FOLLOWUP_POLL_MS = 2 * 60_000;   // 2 minutes — check for pending follow-ups
 const MESSENGER_POLL_MS = 60_000;     // 60 seconds — check inbox
+const ANALYST_POLL_MS = 5 * 60_000;   // 5 minutes — pattern analysis
 const DAILY_DIGEST_HOUR = 0;           // midnight UTC
 
 // Runtime stats for daily digest — persisted to disk so restarts don't wipe them
@@ -136,6 +139,7 @@ async function chainWatchLoop() {
                   console.log(`✓ Posted tweet ${tweetId}`);
                 } catch (e) {
                   console.error(`✗ Tweet failed: ${e.message}`);
+                  analyst.recordError("poster", e);
                 }
               } else {
                 console.log('  (dry run — not posted)');
@@ -152,6 +156,7 @@ async function chainWatchLoop() {
       }
     } catch (e) {
       console.error(`Chain watch error: ${e.message}`);
+      analyst.recordError('chain', e);
     }
 
     if (TEST_MODE) break;
@@ -165,6 +170,7 @@ async function mentionWatchLoop() {
   console.log('📬 Mention watch started');
 
   while (true) {
+    if (analyst.isFrozen()) { await sleep(10_000); continue; }
     try {
       const mentions = await getMentions(lastMentionId);
 
@@ -211,6 +217,7 @@ async function mentionWatchLoop() {
       saveStats();
     } catch (e) {
       console.error(`Mention watch error: ${e.message}`);
+      analyst.recordError('mention', e);
     }
 
     if (TEST_MODE) break;
@@ -314,6 +321,7 @@ async function dailyDigestLoop() {
   let lastDigestDate = null;
 
   while (true) {
+    if (analyst.isFrozen()) { await sleep(10_000); continue; }
     const now = new Date();
     const utcHour = now.getUTCHours();
     const today = now.toISOString().split('T')[0];
@@ -361,6 +369,7 @@ async function dailyDigestLoop() {
         saveStats();
       } catch (e) {
         console.error(`Daily digest error: ${e.message}`);
+        analyst.recordError('digest-post', e);
       }
     }
 
@@ -375,6 +384,7 @@ async function repoWatchLoop() {
   await initRepoMonitor();
 
   while (true) {
+    if (analyst.isFrozen()) { await sleep(10_000); continue; }
     try {
       const updates = await checkRepos();
 
@@ -391,6 +401,7 @@ async function repoWatchLoop() {
             console.log(`✓ Posted repo update tweet ${tweetId}`);
           } catch (e) {
             console.error(`✗ Repo tweet failed: ${e.message}`);
+            analyst.recordError("poster", e);
           }
         } else {
           console.log('  (dry run — not posted)');
@@ -398,6 +409,7 @@ async function repoWatchLoop() {
       }
     } catch (e) {
       console.error(`Repo watch error: ${e.message}`);
+      analyst.recordError('repo', e);
     }
 
     if (TEST_MODE) break;
@@ -413,6 +425,7 @@ async function engagementLoop() {
   console.log('🤝 Community engagement started');
 
   while (true) {
+    if (analyst.isFrozen()) { await sleep(10_000); continue; }
     try {
       if (!DRY_RUN) {
         const results = await engage();
@@ -428,6 +441,7 @@ async function engagementLoop() {
       }
     } catch (e) {
       console.error(`Engagement error: ${e.message}`);
+      analyst.recordError('engagement', e);
     }
 
     if (TEST_MODE) break;
@@ -469,6 +483,7 @@ async function followUpLoop() {
   console.log('📌 Follow-up processor started');
 
   while (true) {
+    if (analyst.isFrozen()) { await sleep(10_000); continue; }
     try {
       const pending = getPendingFollowUps();
 
@@ -528,6 +543,7 @@ async function followUpLoop() {
       cleanupFollowUps();
     } catch (e) {
       console.error(`Follow-up loop error: ${e.message}`);
+      analyst.recordError('followup', e);
     }
 
     if (TEST_MODE) break;
@@ -555,6 +571,7 @@ async function messengerLoop() {
     } catch (e) {
       stats.consecutiveErrors++;
       console.error('Messenger loop error: ' + e.message);
+      analyst.recordError('messenger', e);
 
       if (stats.consecutiveErrors >= 10) {
         await messenger.escalate(
@@ -568,6 +585,26 @@ async function messengerLoop() {
 
     if (TEST_MODE) break;
     await sleep(MESSENGER_POLL_MS);
+  }
+}
+
+
+// ─── Analyst Loop ──────────────────────────────────────────
+
+async function analystLoop() {
+  // Wait 60 seconds before starting (let errors accumulate naturally)
+  await sleep(60_000);
+  console.log('\U0001f4ca Analyst started — monitoring error patterns');
+
+  while (true) {
+    try {
+      await analyst.analyze();
+    } catch (e) {
+      console.error('Analyst loop error: ' + e.message);
+    }
+
+    if (TEST_MODE) break;
+    await sleep(ANALYST_POLL_MS);
   }
 }
 
@@ -600,6 +637,7 @@ async function main() {
 ║  Chain: Cardano mainnet                      ║
 ║  Follow-ups: ${String(getPendingFollowUps().length).padEnd(3)} pending                      ║
 ║  Messenger: ${messenger.isConfigured() ? "✓ Gmail SMTP" : "✗ No credentials"}                  ║
+║  Analyst:   ✓ Pattern detection + X safety       ║
 ╚══════════════════════════════════════════════╝
 `);
 
@@ -639,7 +677,8 @@ async function main() {
     engagementLoop(),
     dailyDigestLoop(),
     followUpLoop(),
-    messengerLoop()
+    messengerLoop(),
+    analystLoop()
   ]).catch(async e => {
     console.error('Fatal error:', e);
     await messenger.escalate('Fatal crash: ' + e.message, 'critical', e.stack);
