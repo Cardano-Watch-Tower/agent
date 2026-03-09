@@ -24,6 +24,11 @@ const engaged = {
   followed: new Set()
 };
 
+// Daily follow cap — protects account from looking botty
+const DAILY_FOLLOW_CAP = 20;
+let dailyFollowCount = 0;
+let dailyFollowReset = Date.now() + 24 * 60 * 60 * 1000;
+
 // Search queries to rotate through
 const SEARCH_QUERIES = [
   '$ADA whale',
@@ -41,7 +46,7 @@ const SEARCH_QUERIES = [
 const ENGAGEMENT_KEYWORDS = [
   'whale', 'moved', 'transfer', 'staking', 'delegation', 'drep',
   'governance', 'treasury', 'suspicious', 'rug', 'scam', 'alert',
-  'on-chain', 'wallet', 'stake key', 'transaction', 'tx',
+  'on-chain', 'wallet', 'stakekey', 'transaction', 'tx',
   'ada', '₳', 'million', 'billion', 'withdrawal', 'deposit'
 ];
 
@@ -98,11 +103,14 @@ async function searchAndEngage(results) {
     await sleep(3000); // slower pace for browser
   }
 
-  // Like the rest that passed keyword filter (no Grok call needed)
+  // Like a few more (cap at 3 to keep Chrome available for mentions)
+  let extraLikes = 0;
   for (const tweet of filtered.slice(3)) {
+    if (extraLikes >= 3) break;
     if (!engaged.liked.has(tweet.id)) {
       await handleLike(tweet, results);
-      await sleep(2000);
+      extraLikes++;
+      await sleep(3000);
     }
   }
 }
@@ -117,9 +125,11 @@ async function decideAction(tweet) {
 "${tweet.text}"
 
 Should we engage? Consider:
-- Does this discuss something we could add value to?
-- Is the author asking a question we could answer with on-chain data?
+- Does this discuss something we could add value to about the CARDANO BLOCKCHAIN?
+- Is the author asking a question we could answer with CARDANO on-chain data?
 - Would engaging look natural and helpful, NOT spammy?
+- If the tweet is about a non-Cardano chain (Solana, Ethereum, BSC, etc.) or a memecoin/token that just happens to be named "Cardano" but is NOT on the Cardano blockchain, SKIP it.
+- If addresses in the tweet don't start with addr1, stake1, drep1, pool1, Ae2, or Ddz — they are NOT Cardano addresses. SKIP.
 
 Respond with ONLY one word: REPLY, LIKE, or SKIP`;
 
@@ -163,6 +173,10 @@ ${onChainContext ? `${onChainContext}\n` : ''}Write a reply from CardanoWatchTow
 - Be helpful and conversational. Add genuine value.
 - If we have on-chain data, share the key finding naturally.
 - If no data, share a relevant observation or offer to help.
+- NEVER fabricate on-chain data, tx counts, or analysis you don't have.
+- Valid Cardano addresses start with addr1, stake1, Ae2, Ddz, drep1, or pool1. Anything else is NOT Cardano.
+- If the tweet discusses a non-Cardano token/address (Solana, Ethereum, etc.), acknowledge it's not your chain. Don't pretend to analyze it.
+- NEVER include cardanoscan.io links unless we provided real on-chain data above.
 - Be a community member first, watchdog second.
 - Under 280 characters.
 - NO hashtags. Zero.
@@ -206,10 +220,30 @@ async function handleLike(tweet, results) {
  * Follow back anyone who follows us.
  */
 async function followBack(results) {
+  const MAX_FOLLOWS_PER_CYCLE = 3;
+
+  // Reset daily counter every 24h
+  if (Date.now() >= dailyFollowReset) {
+    dailyFollowCount = 0;
+    dailyFollowReset = Date.now() + 24 * 60 * 60 * 1000;
+  }
+
+  // Daily cap reached — skip entirely
+  if (dailyFollowCount >= DAILY_FOLLOW_CAP) {
+    return;
+  }
+
   try {
     const followers = await getFollowers(20);
+    let followed = 0;
 
     for (const follower of followers) {
+      if (followed >= MAX_FOLLOWS_PER_CYCLE || dailyFollowCount >= DAILY_FOLLOW_CAP) {
+        if (dailyFollowCount >= DAILY_FOLLOW_CAP) {
+          console.log('  ⏸️ Daily follow cap reached (' + DAILY_FOLLOW_CAP + ')');
+        }
+        break;
+      }
       if (engaged.followed.has(follower.username)) continue;
       if (follower.username === BOT_USERNAME) continue;
 
@@ -217,8 +251,10 @@ async function followBack(results) {
         await followUser(follower.username);
         engaged.followed.add(follower.username);
         results.followed++;
-        console.log(`  👤 Followed back: @${follower.username}`);
-        await sleep(2000);
+        followed++;
+        dailyFollowCount++;
+        console.log('  👤 Followed back: @' + follower.username + ' (' + dailyFollowCount + '/' + DAILY_FOLLOW_CAP + ' today)');
+        await sleep(5000); // Longer gap — gives mention loop a chance to grab the lock
       } catch (e) { /* skip */ }
     }
   } catch (e) {
