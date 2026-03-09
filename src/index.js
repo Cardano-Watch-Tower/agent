@@ -1,12 +1,14 @@
 /**
  * CARDANOWATCHTOWER — Main Orchestrator
  *
- * Runs five concurrent loops:
+ * Runs seven concurrent loops:
  *   1. Chain Watch   — polls new blocks, detects events, posts alerts
  *   2. Mention Watch — checks @mentions, handles queries + detective requests
  *   3. Repo Watch    — monitors GitHub repos, tweets about updates
  *   4. Engagement    — searches Cardano conversations, likes, replies, follows back
  *   5. Daily Digest  — posts daily summary at midnight UTC
+ *   6. Follow-Up     — delivers promised follow-up replies
+ *   7. Messenger     — checks inbox, processes inter-agent messages
  *
  * Usage:
  *   node src/index.js              — full production mode
@@ -19,13 +21,14 @@ const { checkForNewBlock, scanBlock, loadState, saveState, updateState } = requi
 const { formatTweet, formatAlert, formatAda } = require('./formatter');
 const { shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary, casualReply } = require('./brain');
 const { postTweet, postThread, getMentions, reply, splitForThread, isConfigured, BOT_USERNAME } = require('./poster');
-const { parseQuery, investigate, investigateAddress, investigateTx, investigateStake } = require('./investigator');
+const { parseQuery, investigate, investigateAddress, investigateTx, investigateStake, investigateDrep } = require('./investigator');
 const { createJob, executeJob, formatDelivery, listJobs, STATES } = require('./detective');
 const { detectGovernanceEvents, detectTokenEvents } = require('./detectors');
 const { checkRepos, composeUpdateTweet, initialize: initRepoMonitor } = require('./repo-monitor');
 const { engage } = require('./engager');
 const { detectPromise, addFollowUp, getPendingFollowUps, markProcessing, markDelivered, markFailed, cleanup: cleanupFollowUps } = require('./followups');
 const browser = require('./browser');
+const messenger = require('./messenger');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const TEST_MODE = process.argv.includes('--test');
@@ -35,6 +38,7 @@ const MENTION_POLL_MS = 5 * 60_000;    // 5 minutes
 const REPO_POLL_MS = 30 * 60_000;      // 30 minutes
 const ENGAGE_POLL_MS = 15 * 60_000;    // 15 minutes
 const FOLLOWUP_POLL_MS = 2 * 60_000;   // 2 minutes — check for pending follow-ups
+const MESSENGER_POLL_MS = 60_000;     // 60 seconds — check inbox
 const DAILY_DIGEST_HOUR = 0;           // midnight UTC
 
 // Runtime stats for daily digest — persisted to disk so restarts don't wipe them
@@ -83,6 +87,7 @@ const stats = {
   engagementReplies: 0,
   engagementLikes: 0,
   engagementFollows: 0,
+  consecutiveErrors: 0,
   startedAt: new Date().toISOString(),
   date: new Date().toISOString().split('T')[0],
   lastMentionId: null
@@ -171,6 +176,13 @@ async function mentionWatchLoop() {
           continue;
         }
 
+        // Double-check: skip if we already processed this ID
+        if (lastMentionId && mention.id) {
+          try {
+            if (BigInt(mention.id) <= BigInt(lastMentionId)) continue;
+          } catch (e) { /* non-numeric ID, process anyway */ }
+        }
+
         console.log(`\n📨 Mention from @${mention.authorUsername}: ${mention.text}`);
         stats.mentionsHandled++;
 
@@ -187,7 +199,7 @@ async function mentionWatchLoop() {
             lower.includes('trace') || lower.includes('detective')) {
           await handleDetectiveRequest(mention, text);
         } else if (parseQuery(text)) {
-          // Has an address, tx hash, or stake key — on-chain query
+          // Has an address, tx hash, or stakekey — on-chain query
           await handleQuery(mention, text);
         } else {
           // Casual interaction — emoji, greeting, comment, etc.
@@ -210,7 +222,7 @@ async function handleCasual(mention, text) {
   try {
     const replyText = await casualReply(text);
     if (!DRY_RUN) {
-      await reply(mention.id, replyText);
+      await reply(String(mention.id), replyText);
       stats.tweetsPosted++;
     }
     console.log(`  Casual reply: ${replyText}`);
@@ -238,6 +250,7 @@ async function handleQuery(mention, text) {
           case 'address': data = await investigateAddress(q.value); break;
           case 'tx': data = await investigateTx(q.value); break;
           case 'stake': data = await investigateStake(q.value); break;
+          case 'drep': data = await investigateDrep(q.value); break;
           default: continue;
         }
         if (data) results.push(data);
@@ -260,14 +273,10 @@ async function handleQuery(mention, text) {
     // Split if too long
     const tweets = splitForThread(replyText);
     if (!DRY_RUN) {
-      if (tweets.length === 1) {
-        await reply(mention.id, tweets[0]);
-      } else {
-        let prevId = mention.id;
-        for (const t of tweets) {
-          prevId = await postTweet(t, prevId);
-          await sleep(1000);
-        }
+      // Reply all tweets to the original mention (no chaining needed — they appear as replies)
+      for (const t of tweets) {
+        await reply(String(mention.id), t);
+        await sleep(2000);
       }
       stats.tweetsPosted += tweets.length;
     }
@@ -328,6 +337,13 @@ async function dailyDigestLoop() {
         if (!DRY_RUN && isConfigured()) {
           const tweetId = await postTweet(digestText);
           console.log(`✓ Digest posted: ${tweetId}`);
+        }
+
+        // Send email report
+        try {
+          await messenger.dailyReport(digestContext);
+        } catch (e) {
+          console.error('Daily report email error: ' + e.message);
         }
 
         // Reset daily stats
@@ -487,7 +503,7 @@ async function followUpLoop() {
               `[FOLLOW-UP] @${followUp.username} asked: ${followUp.originalText}\n\n` +
               `You promised "${followUp.promiseText}" but couldn't find specific on-chain data. ` +
               `Give a helpful follow-up — acknowledge you checked, share what you found (or didn't), ` +
-              `and offer to help if they share a specific address/tx/stake key.`
+              `and offer to help if they share a specific address/tx/stakekey.`
             );
           }
 
@@ -519,6 +535,40 @@ async function followUpLoop() {
   }
 }
 
+
+// ─── Messenger Loop ─────────────────────────────────────────
+
+async function messengerLoop() {
+  // Wait 30 seconds before starting (let other services init)
+  await sleep(30_000);
+  console.log('📧 Messenger service started');
+
+  while (true) {
+    try {
+      const processed = await messenger.processMessages();
+      if (processed > 0) {
+        console.log('📨 Processed ' + processed + ' message(s)');
+      }
+      stats.consecutiveErrors = 0;
+    } catch (e) {
+      stats.consecutiveErrors++;
+      console.error('Messenger loop error: ' + e.message);
+
+      if (stats.consecutiveErrors >= 10) {
+        await messenger.escalate(
+          'Messenger loop: ' + stats.consecutiveErrors + ' consecutive errors',
+          'warning',
+          'Last error: ' + e.message
+        );
+        stats.consecutiveErrors = 0; // Reset after escalation
+      }
+    }
+
+    if (TEST_MODE) break;
+    await sleep(MESSENGER_POLL_MS);
+  }
+}
+
 // ─── Utilities ──────────────────────────────────────────────
 
 function sleep(ms) {
@@ -547,6 +597,7 @@ async function main() {
 ║  Brain: xAI Grok (direct)                   ║
 ║  Chain: Cardano mainnet                      ║
 ║  Follow-ups: ${String(getPendingFollowUps().length).padEnd(3)} pending                      ║
+║  Messenger: ${messenger.isConfigured() ? "✓ Gmail SMTP" : "✗ No credentials"}                  ║
 ╚══════════════════════════════════════════════╝
 `);
 
@@ -567,12 +618,16 @@ async function main() {
   }
 
   // Graceful shutdown
-  process.on('SIGINT', async () => {
-    console.log('\nShutting down...');
+  const shutdown = async (signal) => {
+    console.log('\nShutting down... (' + (signal || 'unknown') + ')');
     saveStats();
+    await messenger.shutdown(signal || 'Manual shutdown');
     await browser.close();
     process.exit(0);
-  });
+  };
+
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
 
   // Run all loops concurrently
   Promise.all([
@@ -581,9 +636,12 @@ async function main() {
     repoWatchLoop(),
     engagementLoop(),
     dailyDigestLoop(),
-    followUpLoop()
+    followUpLoop(),
+    messengerLoop()
   ]).catch(async e => {
     console.error('Fatal error:', e);
+    await messenger.escalate('Fatal crash: ' + e.message, 'critical', e.stack);
+    saveStats();
     await browser.close();
     process.exit(1);
   });
