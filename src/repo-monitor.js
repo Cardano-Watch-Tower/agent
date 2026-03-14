@@ -1,5 +1,5 @@
 /**
- * REPO MONITOR — Watches the CardanoWatchTower GitHub repos for updates
+ * REPO MONITOR — Watches the CardanoWatchers GitHub repos for updates
  *
  * Polls GitHub API for new commits to:
  *   - Cardano-Watch-Tower/watchers (investigations + findings)
@@ -77,7 +77,7 @@ async function composeUpdateTweet(update) {
     .map(c => `- ${c.message} (${c.sha})`)
     .join('\n');
 
-  const prompt = `CardanoWatchTower just pushed updates to the ${update.label} repository (${update.owner}/${update.repo}).
+  const prompt = `CardanoWatchers just pushed updates to the ${update.label} repository (${update.owner}/${update.repo}).
 
 Recent commits:
 ${commitSummary}

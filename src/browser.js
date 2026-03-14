@@ -305,6 +305,32 @@ async function isLoggedIn() {
 }
 
 /**
+ * Wait for a code to be written to a file (used for 2FA and verification).
+ * Polls every 3 seconds for up to 10 minutes.
+ */
+async function waitForCodeFile(filePath, timeoutMs = 600_000) {
+  const fs = require('fs');
+  const start = Date.now();
+  // Remove any stale code file first
+  try { fs.unlinkSync(filePath); } catch (e) { /* fine */ }
+
+  while (Date.now() - start < timeoutMs) {
+    try {
+      if (fs.existsSync(filePath)) {
+        const code = fs.readFileSync(filePath, 'utf8').trim();
+        if (code.length > 0) {
+          fs.unlinkSync(filePath); // consume it
+          console.log('    Code received: ' + '*'.repeat(code.length));
+          return code;
+        }
+      }
+    } catch (e) { /* ignore */ }
+    await sleep(3000);
+  }
+  throw new Error('Timed out waiting for verification code in ' + filePath);
+}
+
+/**
  * Login to X with username/password.
  * Call this once — after that cookies persist.
  */
@@ -340,8 +366,20 @@ async function login(username, password) {
 
   const verifyInput = await page.$('input[data-testid="ocfEnterTextTextInput"]');
   if (verifyInput) {
-    console.log('⚠️  X is asking for verification (email/phone). Check the browser.');
-    throw new Error('X verification required — need email/phone confirmation');
+    console.log('⚠️  X is asking for email/phone verification.');
+    console.log('    Write your code to /tmp/x_code.txt to continue...');
+    const code = await waitForCodeFile('/tmp/x_code.txt');
+    await verifyInput.type(code.trim(), { delay: 50 });
+    await sleep(500);
+    const nextButtons2 = await page.$$('button');
+    for (const btn of nextButtons2) {
+      const text = await page.evaluate(el => el.textContent, btn);
+      if (text.includes('Next') || text.includes('Verify') || text.includes('Confirm')) {
+        await btn.click();
+        break;
+      }
+    }
+    await sleep(2000);
   }
 
   const passwordInput = await page.waitForSelector('input[autocomplete="current-password"]', { timeout: 10000 });
@@ -357,7 +395,30 @@ async function login(username, password) {
     }
   }
 
-  await sleep(5000);
+  await sleep(4000);
+
+  // Handle 2FA / email code challenge after password entry
+  const twoFaInput = await page.$('input[data-testid="LoginTwoFactorAuthInput"]');
+  const challengeInput = await page.$('input[data-testid="ocfEnterTextTextInput"]');
+  const activeChallenge = twoFaInput || challengeInput;
+  if (activeChallenge) {
+    console.log('⚠️  X is asking for a 2FA or verification code.');
+    console.log('    Write your code to /tmp/x_code.txt to continue...');
+    const code = await waitForCodeFile('/tmp/x_code.txt');
+    await activeChallenge.type(code.trim(), { delay: 50 });
+    await sleep(500);
+    const challengeButtons = await page.$$('button');
+    for (const btn of challengeButtons) {
+      const text = await page.evaluate(el => el.textContent, btn);
+      if (text.includes('Next') || text.includes('Confirm') || text.includes('Log in') || text.includes('Verify')) {
+        await btn.click();
+        break;
+      }
+    }
+    await sleep(3000);
+  }
+
+  await sleep(2000);
   await saveCookies();
 
   const loggedIn = await isLoggedIn();

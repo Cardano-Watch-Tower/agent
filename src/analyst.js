@@ -1,5 +1,5 @@
 /**
- * CWT ANALYST — Error pattern detection + X safety circuit breaker
+ * CW ANALYST — Error pattern detection + X safety circuit breaker
  *
  * Two jobs:
  * 1. X CIRCUIT BREAKER: 2 X-interaction errors = freeze ALL X-touching loops for 5 min.

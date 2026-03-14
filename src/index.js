@@ -11,7 +11,7 @@
  *   7. Messenger        — checks inbox, processes inter-agent messages
  *   8. Analyst          — monitors error patterns, X safety circuit breaker
  *   9. Thoughts         — posts 7-12 original Cardano thoughts per day
- *  10. Help Reminders   — posts 5 reminders per week that CWT is available to help
+ *  10. Help Reminders   — posts 5 reminders per week that CW is available to help
  *
  * Usage:
  *   node src/index.js              — full production mode
@@ -539,7 +539,7 @@ async function thoughtsLoop() {
 
 /**
  * Posts 5 help reminders per week — randomly spaced.
- * Reminds the community that @CardanoWatchTower is available to help
+ * Reminds the community that @CardanoWatchers is available to help
  * with on-chain questions. No fees mentioned.
  */
 async function helpReminderLoop() {
@@ -763,7 +763,7 @@ async function main() {
 
   console.log(`
 ╔══════════════════════════════════════════════╗
-║         CARDANO WATCH TOWER  👁️              ║
+║         CARDANO WATCHERS  👁️              ║
 ║         We're watching.                      ║
 ╠══════════════════════════════════════════════╣
 ║  Mode:     ${DRY_RUN ? 'DRY RUN' : TEST_MODE ? 'TEST   ' : 'LIVE   '}                         ║

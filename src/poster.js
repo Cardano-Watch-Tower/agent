@@ -1,5 +1,5 @@
 /**
- * POSTER — Browser-based X posting for CardanoWatchTower
+ * POSTER — Browser-based X posting for CardanoWatchers
  *
  * No API. No OAuth. No dev account. No tier fees.
  * Just a browser typing and clicking like any user.
@@ -18,7 +18,7 @@ const { withLock } = browser;
 const fs = require('fs');
 const path = require('path');
 
-const BOT_USERNAME = process.env.X_USERNAME || 'CardanoWT';
+const BOT_USERNAME = process.env.BOT_HANDLE || process.env.X_USERNAME || 'CardanoWatchers';
 
 // === Image Attachment ===
 

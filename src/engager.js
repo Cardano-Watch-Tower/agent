@@ -1,5 +1,5 @@
 /**
- * ENGAGER — Proactive community engagement for CardanoWatchTower
+ * ENGAGER — Proactive community engagement for CardanoWatchers
  *
  * Browser-based. No API calls for search/like/follow/repost.
  *
@@ -202,7 +202,7 @@ async function searchAndEngage(results) {
  * Returns: 'reply', 'repost', 'like', or 'skip'
  */
 async function decideAction(tweet) {
-  const prompt = `You're CardanoWatchTower. Here's a tweet:
+  const prompt = `You're CardanoWatchers. Here's a tweet:
 
 "${tweet.text}"
 Author: @${tweet.authorUsername || 'unknown'}
@@ -256,7 +256,7 @@ async function handleReply(tweet, results) {
     const prompt = `A Cardano community member tweeted:
 "${tweet.text}"
 
-${onChainContext ? `${onChainContext}\n` : ''}Write a reply from CardanoWatchTower. Rules:
+${onChainContext ? `${onChainContext}\n` : ''}Write a reply from CardanoWatchers. Rules:
 - Be helpful and conversational. Add genuine value.
 - If we have on-chain data, share the key finding naturally.
 - If no data, share a relevant observation or offer to help.
@@ -379,7 +379,7 @@ async function findAndFollowQualityAccounts(results) {
  * Looks at their recent tweet content for quality signals.
  */
 async function evaluateAccountQuality(tweet) {
-  const prompt = `Should CardanoWatchTower follow this account based on this tweet?
+  const prompt = `Should CardanoWatchers follow this account based on this tweet?
 
 Tweet: "${tweet.text}"
 Author: @${tweet.authorUsername || 'unknown'}

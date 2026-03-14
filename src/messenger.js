@@ -1,12 +1,12 @@
 /**
- * MESSENGER — Communication service for CardanoWatchTower
+ * MESSENGER — Communication service for CardanoWatchers
  *
  * Handles:
- *   - Email notifications via Gmail SMTP (nodemailer)
+ *   - Email notifications via Outlook SMTP (nodemailer)
  *   - Filesystem message queue (inbox/outbox/archive)
  *   - Escalation system (info → warning → critical)
  *   - Daily/monthly report emails
- *   - Inter-agent communication (designer ↔ CWT)
+ *   - Inter-agent communication (designer ↔ CW)
  *
  * Message format: {id, from, to, subject, body, timestamp, priority}
  * Priority levels: info | warning | critical
@@ -47,7 +47,7 @@ let transporter = null;
 function getTransporter() {
   if (!transporter && GMAIL_PASS) {
     transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
+      host: 'smtp-mail.outlook.com',
       port: 587,
       secure: false,
       auth: {
@@ -65,7 +65,7 @@ function getTransporter() {
 async function sendEmail(to, subject, body) {
   const transport = getTransporter();
   if (!transport) {
-    console.log('⚠️  Messenger: No Gmail credentials — email skipped');
+    console.log('⚠️  Messenger: No email credentials — email skipped');
     // Still write to outbox so message isn't lost
     writeOutbox(to, subject, body, 'info');
     return false;
@@ -73,9 +73,9 @@ async function sendEmail(to, subject, body) {
 
   try {
     const result = await transport.sendMail({
-      from: `"Cardano Watch Tower" <${GMAIL_USER}>`,
+      from: `"Cardano Watchers" <${GMAIL_USER}>`,
       to,
-      subject: `[CWT] ${subject}`,
+      subject: `[CW] ${subject}`,
       text: body,
       html: body.replace(/\n/g, '<br>')
     });
@@ -188,7 +188,7 @@ async function escalate(issue, severity = 'info', details = '') {
 // ─── Shutdown Notification ──────────────────────────────────
 
 async function shutdown(reason = 'Unknown') {
-  const body = `CWT is shutting down.\n\nReason: ${reason}\nTime: ${new Date().toISOString()}\n\nThe agent will need to be manually restarted if this was not a planned shutdown.`;
+  const body = `CW is shutting down.\n\nReason: ${reason}\nTime: ${new Date().toISOString()}\n\nThe agent will need to be manually restarted if this was not a planned shutdown.`;
 
   console.log(`🛑 Shutdown initiated: ${reason}`);
   writeOutbox(NOTIFY_EMAIL, `Shutdown: ${reason}`, body, 'critical');
@@ -211,7 +211,7 @@ async function dailyReport(stats) {
 
   const body = `
 ═══════════════════════════════════════════
-  CARDANO WATCH TOWER — Daily Report
+  CARDANO WATCHERS — Daily Report
   Date: ${date}
   Uptime: ${uptime}
 ═══════════════════════════════════════════
@@ -262,7 +262,7 @@ async function hourlyReport(stats) {
     ? Math.round((Date.now() - new Date(stats.startedAt).getTime()) / 60000) + 'min'
     : 'unknown';
 
-  const body = `CWT Hourly Status — ${timestamp.split('T')[0]} ${String(hour).padStart(2,'0')}:00 UTC
+  const body = `CW Hourly Status — ${timestamp.split('T')[0]} ${String(hour).padStart(2,'0')}:00 UTC
 
 Uptime: ${uptime}
 Blocks: ${stats.blocksScanned || 0} | Alerts: ${stats.alertsGenerated || 0}

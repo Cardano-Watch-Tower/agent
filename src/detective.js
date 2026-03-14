@@ -2,7 +2,7 @@
  * DETECTIVE — Hireable on-chain investigation service
  *
  * Flow:
- *   1. User tags @CardanoWatchTower with a request
+ *   1. User tags @CardanoWatchers with a request
  *   2. Brain assesses complexity and generates quote
  *   3. Bot replies with quote and payment address
  *   4. User pays → bot detects payment on-chain
@@ -148,7 +148,7 @@ Write a professional but concise investigation report (3-5 paragraphs). Include:
 3. Any patterns or concerns identified
 4. Conclusion
 
-Maintain the CardanoWatchTower voice — professional, direct, data-driven.`;
+Maintain the CardanoWatchers voice — professional, direct, data-driven.`;
 
   try {
     findings.summary = await chat(

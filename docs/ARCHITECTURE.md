@@ -1,4 +1,4 @@
-# Architecture — CardanoWatchTower Agent
+# Architecture — CardanoWatchers Agent
 
 ## System Overview
 

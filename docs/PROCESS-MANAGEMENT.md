@@ -1,4 +1,4 @@
-# Process Management — CardanoWatchTower Agent
+# Process Management — CardanoWatchers Agent
 
 ## Quick Reference: Kill Everything and Restart
 
@@ -10,10 +10,10 @@ powershell -Command "Stop-Process -Name chrome -Force -ErrorAction SilentlyConti
 ping -n 6 127.0.0.1 >nul
 
 # 3. Clean Chrome lock files
-node -e "const fs=require('fs'),p=require('path'),d=p.join('C:\\Users\\thisc\\Documents\\Projects\\CardanoWatchTower\\watchers\\agent','.chrome-profile');['lockfile','SingletonLock','SingletonCookie','SingletonSocket','DevToolsActivePort'].forEach(f=>{const fp=p.join(d,f);try{if(fs.existsSync(fp)){fs.unlinkSync(fp);console.log('Deleted:',f)}}catch(e){console.log('Skip:',f,e.code)}})"
+node -e "const fs=require('fs'),p=require('path'),d=p.join('C:\\Users\\thisc\\Documents\\Projects\\CardanoWatchers\\watchers\\agent','.chrome-profile');['lockfile','SingletonLock','SingletonCookie','SingletonSocket','DevToolsActivePort'].forEach(f=>{const fp=p.join(d,f);try{if(fs.existsSync(fp)){fs.unlinkSync(fp);console.log('Deleted:',f)}}catch(e){console.log('Skip:',f,e.code)}})"
 
 # 4. Start agent
-cd C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent
+cd C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent
 node src/index.js
 ```
 
@@ -26,13 +26,13 @@ are running, kill selectively instead (see Selective Kill below).
 
 | What | Path |
 |------|------|
-| Agent entry | `C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\src\index.js` |
-| Browser manager | `C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\src\browser.js` |
-| Chrome profile | `C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.chrome-profile\` |
-| Cookies | `C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.cookies.json` |
-| Screenshots | `C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\screenshots\` |
-| Follow-ups queue | `C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\followups.json` |
-| Environment | `C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.env` |
+| Agent entry | `C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\src\index.js` |
+| Browser manager | `C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\src\browser.js` |
+| Chrome profile | `C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.chrome-profile\` |
+| Cookies | `C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.cookies.json` |
+| Screenshots | `C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\screenshots\` |
+| Follow-ups queue | `C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\followups.json` |
+| Environment | `C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.env` |
 
 ---
 
@@ -96,11 +96,11 @@ taskkill /F /IM chrome.exe
 ping -n 6 127.0.0.1 >nul
 
 # Delete locks manually
-Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.chrome-profile\lockfile" -Force -ErrorAction SilentlyContinue
-Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.chrome-profile\SingletonLock" -Force -ErrorAction SilentlyContinue
-Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.chrome-profile\SingletonCookie" -Force -ErrorAction SilentlyContinue
-Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.chrome-profile\SingletonSocket" -Force -ErrorAction SilentlyContinue
-Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent\.chrome-profile\DevToolsActivePort" -Force -ErrorAction SilentlyContinue
+Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.chrome-profile\lockfile" -Force -ErrorAction SilentlyContinue
+Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.chrome-profile\SingletonLock" -Force -ErrorAction SilentlyContinue
+Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.chrome-profile\SingletonCookie" -Force -ErrorAction SilentlyContinue
+Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.chrome-profile\SingletonSocket" -Force -ErrorAction SilentlyContinue
+Remove-Item "C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent\.chrome-profile\DevToolsActivePort" -Force -ErrorAction SilentlyContinue
 ```
 
 ### EBUSY lockfile (file still held by OS)
@@ -119,7 +119,7 @@ The agent uses persistent cookies in `.cookies.json` and a Chrome profile in
 
 ### Session expired — manual login needed
 ```bash
-cd C:\Users\thisc\Documents\Projects\CardanoWatchTower\watchers\agent
+cd C:\Users\thisc\Documents\Projects\CardanoWatchers\watchers\agent
 node headful-login.js
 ```
 This opens a visible Chrome window with the agent's profile. Log in manually at

@@ -193,7 +193,7 @@ async function analyzeTx(txHash, block) {
 
 async function run() {
   console.log('╔══════════════════════════════════════════════════════════════╗');
-  console.log('║   CARDANO WATCH TOWER — Chain Watcher                      ║');
+  console.log('║   CARDANO WATCHERS — Chain Watcher                      ║');
   console.log('║   Cardano, we\'re watching.                                 ║');
   console.log('╚══════════════════════════════════════════════════════════════╝');
   console.log(`  Threshold: ${(ADA_THRESHOLD/1_000_000).toFixed(0)}M ADA`);

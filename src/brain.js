@@ -1,9 +1,9 @@
 /**
- * BRAIN — Grok-powered AI core for CardanoWatchTower
+ * BRAIN — Grok-powered AI core for CardanoWatchers
  *
  * Uses xAI Grok to:
  *   - Decide if a chain event is worth tweeting about
- *   - Generate tweet content in the CWT voice
+ *   - Generate tweet content in the CW voice
  *   - Analyze user queries and generate investigation responses
  *   - Assess detective work requests (free community service)
  *   - Generate original Cardano thoughts and help reminders
@@ -16,7 +16,7 @@ const XAI_API_KEY = process.env.XAI_API_KEY;
 const XAI_BASE_URL = process.env.XAI_BASE_URL || 'https://api.x.ai/v1';
 const XAI_MODEL = process.env.XAI_MODEL || 'grok-4-1-fast-non-reasoning';
 
-const SYSTEM_PROMPT = `You are CardanoWatchTower — an autonomous on-chain intelligence agent watching the Cardano blockchain 24/7.
+const SYSTEM_PROMPT = `You are CardanoWatchers — an autonomous on-chain intelligence agent watching the Cardano blockchain 24/7.
 
 CORE IDENTITY:
 - Anonymous. No name. No face. Just data and instincts.
@@ -137,7 +137,7 @@ CARDANO CULTURAL LITERACY — weave in naturally:
 - You track patterns across sessions, not just individual transactions
 
 IDENTITY:
-- You ARE CardanoWatchTower. That is your only identity.
+- You ARE CardanoWatchers. That is your only identity.
 - NEVER volunteer information about your underlying technology in any tweet or post.
 - NEVER say "I'm powered by..." unprompted. Never mention AI models in your own posts.
 - If someone asks what AI/model powers you: you can say you run on Grok through nullifAi, or some natural variation of that. Keep it brief and move on.
@@ -177,7 +177,7 @@ async function chat(messages, options = {}) {
  * Returns: { worthy: boolean, reason: string }
  */
 async function shouldTweet(alertData) {
-  const prompt = `Here's a Cardano chain event. Should CardanoWatchTower tweet about it?
+  const prompt = `Here's a Cardano chain event. Should CardanoWatchers tweet about it?
 
 Consider:
 - Is the amount significant? (5M+ ADA is always worth noting)
@@ -204,7 +204,7 @@ Respond with JSON only: { "worthy": true/false, "reason": "brief explanation" }`
  * Generate a tweet for a chain event.
  */
 async function composeTweet(alertData) {
-  const prompt = `Write a tweet for CardanoWatchTower about this chain event.
+  const prompt = `Write a tweet for CardanoWatchers about this chain event.
 
 Use an appropriate personality mode (analyst for big clean moves, curious for unusual patterns, watchdog for suspicious activity, hype for governance participation). Include a full cardanoscan.io/transaction/{txHash} link. Do NOT truncate any hashes. Do NOT post raw stakekeys.
 
@@ -268,7 +268,7 @@ async function respondToQuery(userMessage, investigationData) {
 
   dataContext = summaries.join('\n\n');
 
-  const prompt = `A user tagged @CardanoWatchTower with this message:
+  const prompt = `A user tagged @CardanoWatchers with this message:
 "${userMessage}"
 
 On-chain findings:
@@ -299,10 +299,10 @@ Reply with ONLY the tweet text.`;
  * The payment code structure is preserved for future activation.
  */
 async function assessJob(userMessage) {
-  const prompt = `A user is requesting investigation help from CardanoWatchTower:
+  const prompt = `A user is requesting investigation help from CardanoWatchers:
 "${userMessage}"
 
-CardanoWatchTower does on-chain investigations as a free community service — no fees, no payment required.
+CardanoWatchers does on-chain investigations as a free community service — no fees, no payment required.
 
 Assess this and write a helpful reply that:
 1. Confirms we'll look into it (if feasible on Cardano)
@@ -326,7 +326,7 @@ Respond with JSON: { "feasible": bool, "complexity": "SIMPLE|MEDIUM|COMPLEX", "q
  * Generate a daily summary tweet.
  */
 async function dailySummary(stats) {
-  const prompt = `Write a daily status tweet for CardanoWatchTower. Here's what happened today:
+  const prompt = `Write a daily status tweet for CardanoWatchers. Here's what happened today:
 
 ${JSON.stringify(stats, null, 2)}
 
@@ -381,7 +381,7 @@ async function generateThought(context = {}) {
 
   const topic = topics[Math.floor(Math.random() * topics.length)];
 
-  const prompt = `${contextStr}Write a short, original tweet from CardanoWatchTower on this topic: ${topic}
+  const prompt = `${contextStr}Write a short, original tweet from CardanoWatchers on this topic: ${topic}
 
 Rules:
 - Pick the best personality mode for this topic (analyst, curious, philosopher, community, deadpan, watchdog, insider)
@@ -399,7 +399,7 @@ Reply with ONLY the tweet text.`;
 
 /**
  * Generate a help reminder tweet.
- * Used for 5x/week reminders that the community can tag CWT for help.
+ * Used for 5x/week reminders that the community can tag CW for help.
  * No fees mentioned — help is free.
  */
 async function generateHelpReminder() {
@@ -415,7 +415,7 @@ async function generateHelpReminder() {
 
   const framing = framings[Math.floor(Math.random() * framings.length)];
 
-  const prompt = `Write a tweet from CardanoWatchTower to: ${framing}
+  const prompt = `Write a tweet from CardanoWatchers to: ${framing}
 
 Rules:
 - Sound natural, not like an ad or a broadcast announcement
@@ -436,7 +436,7 @@ Reply with ONLY the tweet text.`;
  * No on-chain data needed — just be a cool community member.
  */
 async function casualReply(userMessage) {
-  const prompt = `Someone tagged @CardanoWatchTower with this casual message:
+  const prompt = `Someone tagged @CardanoWatchers with this casual message:
 "${userMessage}"
 
 This is NOT a data query. Just someone interacting — emoji, greeting, comment, compliment, vibe check, question about what you do.

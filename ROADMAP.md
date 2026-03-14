@@ -1,4 +1,4 @@
-# CardanoWatchTower — v2 Roadmap
+# CardanoWatchers — v2 Roadmap
 
 ## Bugs — Fix Next Session
 
