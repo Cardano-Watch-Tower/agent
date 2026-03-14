@@ -21,8 +21,8 @@ const path = require('path');
 
 // === CONFIG ===
 const POLL_INTERVAL = 30_000;         // 30 seconds between block checks
-const ADA_THRESHOLD = 100_000;        // Alert on movements > 100K ADA
-const WHALE_THRESHOLD = 10_000_000;   // Extra attention > 10M ADA
+const ADA_THRESHOLD = 5_000_000;      // Alert on movements >= 5M ADA
+const WHALE_THRESHOLD = 10_000_000;   // WHALE classification >= 10M ADA
 const STATE_FILE = path.join(__dirname, '..', 'watcher-state.json');
 
 // === STATE ===
@@ -196,7 +196,7 @@ async function run() {
   console.log('║   CARDANO WATCH TOWER — Chain Watcher                      ║');
   console.log('║   Cardano, we\'re watching.                                 ║');
   console.log('╚══════════════════════════════════════════════════════════════╝');
-  console.log(`  Threshold: ${ADA_THRESHOLD.toLocaleString()} ADA`);
+  console.log(`  Threshold: ${(ADA_THRESHOLD/1_000_000).toFixed(0)}M ADA`);
   console.log(`  Whale:     ${WHALE_THRESHOLD.toLocaleString()} ADA`);
   console.log(`  Poll:      ${POLL_INTERVAL / 1000}s`);
   console.log('');

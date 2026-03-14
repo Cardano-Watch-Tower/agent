@@ -1,15 +1,17 @@
 /**
  * CARDANOWATCHTOWER — Main Orchestrator
  *
- * Runs eight concurrent loops:
- *   1. Chain Watch   — polls new blocks, detects events, posts alerts
- *   2. Mention Watch — checks @mentions, handles queries + detective requests
- *   3. Repo Watch    — monitors GitHub repos, tweets about updates
- *   4. Engagement    — searches Cardano conversations, likes, replies, follows back
- *   5. Daily Digest  — posts daily summary at midnight UTC
- *   6. Follow-Up     — delivers promised follow-up replies
- *   7. Messenger     — checks inbox, processes inter-agent messages
- *   8. Analyst       — monitors error patterns, X safety circuit breaker
+ * Runs ten concurrent loops:
+ *   1. Chain Watch      — polls new blocks, detects events, posts alerts
+ *   2. Mention Watch    — checks @mentions, handles queries + investigation requests
+ *   3. Repo Watch       — monitors GitHub repos, tweets about updates
+ *   4. Engagement       — searches Cardano conversations, likes, replies, follows, reposts
+ *   5. Daily Digest     — posts daily summary at midnight UTC
+ *   6. Follow-Up        — delivers promised follow-up replies
+ *   7. Messenger        — checks inbox, processes inter-agent messages
+ *   8. Analyst          — monitors error patterns, X safety circuit breaker
+ *   9. Thoughts         — posts 7-12 original Cardano thoughts per day
+ *  10. Help Reminders   — posts 5 reminders per week that CWT is available to help
  *
  * Usage:
  *   node src/index.js              — full production mode
@@ -20,7 +22,7 @@ require('dotenv').config();
 
 const { checkForNewBlock, scanBlock, loadState, saveState, updateState } = require('./watcher');
 const { formatTweet, formatAlert, formatAda } = require('./formatter');
-const { shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary, casualReply } = require('./brain');
+const { shouldTweet, composeTweet, respondToQuery, assessJob, dailySummary, casualReply, generateThought, generateHelpReminder } = require('./brain');
 const { postTweet, postThread, getMentions, reply, splitForThread, isConfigured, BOT_USERNAME } = require('./poster');
 const { parseQuery, investigate, investigateAddress, investigateTx, investigateStake, investigateDrep } = require('./investigator');
 const { createJob, executeJob, formatDelivery, listJobs, STATES } = require('./detective');
@@ -35,13 +37,14 @@ const analyst = require('./analyst');
 const DRY_RUN = process.argv.includes('--dry-run');
 const TEST_MODE = process.argv.includes('--test');
 
-const CHAIN_POLL_MS = 30_000;          // 30 seconds
-const MENTION_POLL_MS = 5 * 60_000;    // 5 minutes
-const REPO_POLL_MS = 30 * 60_000;      // 30 minutes
-const ENGAGE_POLL_MS = 15 * 60_000;    // 15 minutes
-const FOLLOWUP_POLL_MS = 2 * 60_000;   // 2 minutes — check for pending follow-ups
-const MESSENGER_POLL_MS = 60_000;     // 60 seconds — check inbox
-const ANALYST_POLL_MS = 5 * 60_000;   // 5 minutes — pattern analysis
+const CHAIN_POLL_MS    = 30_000;       // 30 seconds
+const MENTION_POLL_MS  = 5 * 60_000;   // 5 minutes
+const REPO_POLL_MS     = 30 * 60_000;  // 30 minutes
+const ENGAGE_POLL_MS   = 15 * 60_000;  // 15 minutes
+const FOLLOWUP_POLL_MS = 2 * 60_000;   // 2 minutes
+const MESSENGER_POLL_MS = 60_000;      // 60 seconds
+const ANALYST_POLL_MS  = 5 * 60_000;   // 5 minutes
+const THOUGHT_POLL_MS  = 90 * 60_000;  // 90 minutes (7-12 posts/day spread over 24h)
 const DAILY_DIGEST_HOUR = 0;           // midnight UTC
 
 // Runtime stats for daily digest — persisted to disk so restarts don't wipe them
@@ -90,13 +93,15 @@ const stats = {
   engagementReplies: 0,
   engagementLikes: 0,
   engagementFollows: 0,
+  engagementReposts: 0,
+  thoughtsPosted: 0,
+  helpRemindersPosted: 0,
   consecutiveErrors: 0,
   startedAt: new Date().toISOString(),
   date: new Date().toISOString().split('T')[0],
   lastMentionId: null
 };
 
-// lastMentionId lives in stats so it persists across restarts
 let lastMentionId = null;
 
 // ─── Chain Watch Loop ───────────────────────────────────────
@@ -118,14 +123,12 @@ async function chainWatchLoop() {
 
           for (const alert of alerts) {
             stats.alertsGenerated++;
-            // Track largest move of the day
             if (alert.totalMoved && alert.totalMoved > stats.largestMoveAda) {
               stats.largestMoveAda = alert.totalMoved;
               stats.largestMoveTx = alert.txHash;
             }
             console.log(formatAlert(alert));
 
-            // Ask the brain if this is worth tweeting
             const verdict = await shouldTweet(alert);
 
             if (verdict.worthy) {
@@ -139,7 +142,7 @@ async function chainWatchLoop() {
                   console.log(`✓ Posted tweet ${tweetId}`);
                 } catch (e) {
                   console.error(`✗ Tweet failed: ${e.message}`);
-                  analyst.recordError("poster", e);
+                  analyst.recordError('poster', e);
                 }
               } else {
                 console.log('  (dry run — not posted)');
@@ -175,14 +178,12 @@ async function mentionWatchLoop() {
       const mentions = await getMentions(lastMentionId);
 
       for (const mention of mentions) {
-        // Skip our own tweets — don't reply to yourself
         const mentionAuthor = (mention.authorUsername || '').toLowerCase();
         if (mentionAuthor === BOT_USERNAME.toLowerCase()) {
           console.log(`  (skipped own tweet: ${mention.text.substring(0, 60)}...)`);
           continue;
         }
 
-        // Double-check: skip if we already processed this ID
         if (lastMentionId && mention.id) {
           try {
             if (BigInt(mention.id) <= BigInt(lastMentionId)) continue;
@@ -192,12 +193,10 @@ async function mentionWatchLoop() {
         console.log(`\n📨 Mention from @${mention.authorUsername}: ${mention.text}`);
         stats.mentionsHandled++;
 
-        // Update last seen
         if (!lastMentionId || mention.id > lastMentionId) {
           lastMentionId = mention.id;
         }
 
-        // Determine intent: detective request, on-chain query, or casual interaction
         const text = mention.text.replace(/@\w+/g, '').trim();
         const lower = text.toLowerCase();
 
@@ -205,15 +204,12 @@ async function mentionWatchLoop() {
             lower.includes('trace') || lower.includes('detective')) {
           await handleDetectiveRequest(mention, text);
         } else if (parseQuery(text)) {
-          // Has an address, tx hash, or stakekey — on-chain query
           await handleQuery(mention, text);
         } else {
-          // Casual interaction — emoji, greeting, comment, etc.
           await handleCasual(mention, text);
         }
       }
 
-      // Persist lastMentionId so restarts don't re-reply
       saveStats();
     } catch (e) {
       console.error(`Mention watch error: ${e.message}`);
@@ -233,8 +229,6 @@ async function handleCasual(mention, text) {
       stats.tweetsPosted++;
     }
     console.log(`  Casual reply: ${replyText}`);
-
-    // Check if our reply made a promise we need to deliver on
     checkForPromise(mention, text, replyText);
   } catch (e) {
     console.error(`  Casual reply error: ${e.message}`);
@@ -244,9 +238,8 @@ async function handleCasual(mention, text) {
 async function handleQuery(mention, text) {
   try {
     const parsed = parseQuery(text);
-    if (!parsed) return; // safety — shouldn't happen since we check before calling
+    if (!parsed) return;
 
-    // Build list of queries (single or multi)
     const queries = parsed.multi ? [...parsed] : [parsed];
     const results = [];
 
@@ -255,9 +248,9 @@ async function handleQuery(mention, text) {
         let data;
         switch (q.type) {
           case 'address': data = await investigateAddress(q.value); break;
-          case 'tx': data = await investigateTx(q.value); break;
-          case 'stake': data = await investigateStake(q.value); break;
-          case 'drep': data = await investigateDrep(q.value); break;
+          case 'tx':      data = await investigateTx(q.value);      break;
+          case 'stake':   data = await investigateStake(q.value);   break;
+          case 'drep':    data = await investigateDrep(q.value);    break;
           default: continue;
         }
         if (data) results.push(data);
@@ -267,20 +260,16 @@ async function handleQuery(mention, text) {
     }
 
     if (results.length === 0) {
-      // All lookups failed — reply gracefully
       const fallback = await casualReply(`${text}\n(They shared some on-chain data but lookups failed — be helpful, suggest trying again)`);
       if (!DRY_RUN) await reply(mention.id, fallback);
       return;
     }
 
-    // Pass single result or array to brain
     const data = results.length === 1 ? results[0] : results;
     const replyText = await respondToQuery(text, data);
 
-    // Split if too long
     const tweets = splitForThread(replyText);
     if (!DRY_RUN) {
-      // Reply all tweets to the original mention (no chaining needed — they appear as replies)
       for (const t of tweets) {
         await reply(String(mention.id), t);
         await sleep(2000);
@@ -288,27 +277,61 @@ async function handleQuery(mention, text) {
       stats.tweetsPosted += tweets.length;
     }
     console.log(`  Reply (${tweets.length} tweets): ${tweets[0]?.substring(0, 80)}...`);
-
-    // Check if our reply promised a deeper follow-up
     checkForPromise(mention, text, replyText);
   } catch (e) {
     console.error(`  Query handling error: ${e.message}`);
   }
 }
 
+/**
+ * Handle investigation requests.
+ * Investigations are free — no payment required.
+ * Payment code is preserved in detective.js for future activation.
+ */
 async function handleDetectiveRequest(mention, text) {
   try {
-    const job = await createJob(text, mention.authorId);
-    stats.jobsCreated++;
+    // Check if they provided an address/tx we can immediately investigate
+    const parsed = parseQuery(text);
 
-    const quoteReply = job.assessment?.reply ||
-      `📋 Job #${job.id} — ${formatAda(job.quoteAda)} quote. DM to confirm.`;
+    if (parsed) {
+      // We have something to investigate — do it now, for free
+      console.log(`  🔍 Investigating for @${mention.authorUsername}...`);
+      try {
+        let data;
+        switch (parsed.type) {
+          case 'address': data = await investigateAddress(parsed.value); break;
+          case 'tx':      data = await investigateTx(parsed.value);      break;
+          case 'stake':   data = await investigateStake(parsed.value);   break;
+          case 'drep':    data = await investigateDrep(parsed.value);    break;
+        }
+
+        if (data) {
+          const replyText = await respondToQuery(text, data);
+          const tweets = splitForThread(replyText);
+          if (!DRY_RUN) {
+            for (const t of tweets) {
+              await reply(String(mention.id), t);
+              await sleep(2000);
+            }
+            stats.tweetsPosted += tweets.length;
+          }
+          console.log(`  Investigation reply (${tweets.length} tweets): ${tweets[0]?.substring(0, 80)}...`);
+          return;
+        }
+      } catch (e) {
+        console.error(`  Investigation lookup failed: ${e.message}`);
+      }
+    }
+
+    // No address/tx found — ask them to provide one, still positioned as free help
+    const assessment = await assessJob(text);
+    const replyText = assessment.reply || 'Drop the address or tx hash and we\'ll take a look.';
 
     if (!DRY_RUN) {
-      await reply(mention.id, quoteReply);
+      await reply(mention.id, replyText);
       stats.tweetsPosted++;
     }
-    console.log(`  Detective quote: ${quoteReply}`);
+    console.log(`  Investigation response: ${replyText}`);
   } catch (e) {
     console.error(`  Detective request error: ${e.message}`);
   }
@@ -330,7 +353,6 @@ async function dailyDigestLoop() {
       lastDigestDate = today;
 
       try {
-        // Compute uptime and enrich stats for the brain
         const uptimeMs = Date.now() - new Date(stats.startedAt).getTime();
         const uptimeHours = Math.round(uptimeMs / 3_600_000);
         const digestContext = {
@@ -347,7 +369,6 @@ async function dailyDigestLoop() {
           console.log(`✓ Digest posted: ${tweetId}`);
         }
 
-        // Send email report
         try {
           await messenger.dailyReport(digestContext);
         } catch (e) {
@@ -365,6 +386,9 @@ async function dailyDigestLoop() {
         stats.engagementReplies = 0;
         stats.engagementLikes = 0;
         stats.engagementFollows = 0;
+        stats.engagementReposts = 0;
+        stats.thoughtsPosted = 0;
+        stats.helpRemindersPosted = 0;
         stats.startedAt = new Date().toISOString();
         saveStats();
       } catch (e) {
@@ -374,7 +398,7 @@ async function dailyDigestLoop() {
     }
 
     if (TEST_MODE) break;
-    await sleep(60_000); // Check every minute
+    await sleep(60_000);
   }
 }
 
@@ -390,7 +414,6 @@ async function repoWatchLoop() {
 
       for (const update of updates) {
         console.log(`\n📂 Repo update: ${update.owner}/${update.repo} — ${update.commits.length} new commit(s)`);
-
         const tweetText = await composeUpdateTweet(update);
         console.log(`🐦 Repo tweet: ${tweetText}`);
 
@@ -401,10 +424,8 @@ async function repoWatchLoop() {
             console.log(`✓ Posted repo update tweet ${tweetId}`);
           } catch (e) {
             console.error(`✗ Repo tweet failed: ${e.message}`);
-            analyst.recordError("poster", e);
+            analyst.recordError('poster', e);
           }
-        } else {
-          console.log('  (dry run — not posted)');
         }
       }
     } catch (e) {
@@ -420,8 +441,7 @@ async function repoWatchLoop() {
 // ─── Community Engagement Loop ─────────────────────────────
 
 async function engagementLoop() {
-  // Wait 2 minutes before first engagement cycle (let other loops initialize)
-  await sleep(120_000);
+  await sleep(120_000); // 2-minute warmup
   console.log('🤝 Community engagement started');
 
   while (true) {
@@ -429,15 +449,16 @@ async function engagementLoop() {
     try {
       if (!DRY_RUN) {
         const results = await engage();
-        if (results.replied > 0 || results.liked > 0 || results.followed > 0) {
-          console.log(`\n🤝 Engagement: ${results.searched} found, ${results.replied} replies, ${results.liked} likes, ${results.followed} follows`);
+        const hasActivity = results.replied > 0 || results.liked > 0 || results.followed > 0 || results.reposted > 0;
+        if (hasActivity) {
+          console.log(`\n🤝 Engagement: ${results.searched} found, ${results.replied} replies, ${results.liked} likes, ${results.followed} follows, ${results.reposted} reposts`);
           stats.tweetsPosted += results.replied;
           stats.engagementReplies += results.replied;
           stats.engagementLikes += results.liked;
           stats.engagementFollows += results.followed;
+          stats.engagementReposts += results.reposted;
+          saveStats();
         }
-      } else {
-        console.log('  (dry run — engagement skipped)');
       }
     } catch (e) {
       console.error(`Engagement error: ${e.message}`);
@@ -449,17 +470,146 @@ async function engagementLoop() {
   }
 }
 
-// ─── Follow-Up Accountability ──────────────────────────────
+// ─── Original Thoughts Loop ─────────────────────────────────
 
 /**
- * After we reply to someone, check if our reply promised to do something.
- * If it did, and we can figure out WHAT to investigate, queue a follow-up.
+ * Posts 7-12 original Cardano thoughts per day.
+ * Spread across the day every ~90 minutes.
+ * Daily target is randomized in the 7-12 range.
  */
+async function thoughtsLoop() {
+  await sleep(300_000); // 5-minute warmup
+
+  // Randomize daily target for thoughts
+  const dailyThoughtsTarget = Math.floor(Math.random() * 6) + 7; // 7-12
+  let thoughtsToday = 0;
+  let thoughtsResetDate = new Date().toISOString().split('T')[0];
+
+  console.log(`💭 Thoughts loop started — target: ${dailyThoughtsTarget} posts today`);
+
+  while (true) {
+    if (analyst.isFrozen()) { await sleep(10_000); continue; }
+
+    // Reset counter at midnight UTC
+    const today = new Date().toISOString().split('T')[0];
+    if (today !== thoughtsResetDate) {
+      thoughtsToday = 0;
+      thoughtsResetDate = today;
+      // New random target for the day
+      const newTarget = Math.floor(Math.random() * 6) + 7;
+      console.log(`💭 New day — thoughts target: ${newTarget}`);
+    }
+
+    if (thoughtsToday < dailyThoughtsTarget) {
+      try {
+        if (!DRY_RUN && isConfigured()) {
+          // Give the brain some context from today's activity
+          const context = {
+            blocksScanned: stats.blocksScanned,
+            alertsGenerated: stats.alertsGenerated,
+            largestMoveAda: stats.largestMoveAda > 0 ? stats.largestMoveAda : undefined,
+          };
+
+          const thought = await generateThought(Object.keys(context).length > 0 ? context : {});
+          console.log(`\n💭 Thought: ${thought}`);
+
+          const tweetId = await postTweet(thought);
+          thoughtsToday++;
+          stats.tweetsPosted++;
+          stats.thoughtsPosted++;
+          saveStats();
+          console.log(`✓ Thought posted (${thoughtsToday}/${dailyThoughtsTarget} today): ${tweetId}`);
+        } else if (DRY_RUN) {
+          const thought = await generateThought({});
+          console.log(`\n💭 [DRY RUN] Thought: ${thought}`);
+          thoughtsToday++;
+        }
+      } catch (e) {
+        console.error(`Thought post error: ${e.message}`);
+        analyst.recordError('poster', e);
+      }
+    }
+
+    if (TEST_MODE) break;
+    await sleep(THOUGHT_POLL_MS);
+  }
+}
+
+// ─── Help Reminder Loop ─────────────────────────────────────
+
+/**
+ * Posts 5 help reminders per week — randomly spaced.
+ * Reminds the community that @CardanoWatchTower is available to help
+ * with on-chain questions. No fees mentioned.
+ */
+async function helpReminderLoop() {
+  await sleep(600_000); // 10-minute warmup
+
+  const REMINDERS_PER_WEEK = 5;
+  const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const BASE_INTERVAL_MS = Math.floor(WEEK_MS / REMINDERS_PER_WEEK); // ~1.4 days between reminders
+
+  let remindersThisWeek = 0;
+  let weekStartDate = getWeekStart();
+
+  console.log(`📢 Help reminder loop started — ${REMINDERS_PER_WEEK} reminders per week`);
+
+  while (true) {
+    if (analyst.isFrozen()) { await sleep(10_000); continue; }
+
+    // Reset weekly counter
+    const currentWeekStart = getWeekStart();
+    if (currentWeekStart !== weekStartDate) {
+      remindersThisWeek = 0;
+      weekStartDate = currentWeekStart;
+      console.log('📢 New week — help reminder counter reset');
+    }
+
+    if (remindersThisWeek < REMINDERS_PER_WEEK) {
+      try {
+        if (!DRY_RUN && isConfigured()) {
+          const reminderText = await generateHelpReminder();
+          console.log(`\n📢 Help reminder: ${reminderText}`);
+
+          const tweetId = await postTweet(reminderText);
+          remindersThisWeek++;
+          stats.tweetsPosted++;
+          stats.helpRemindersPosted++;
+          saveStats();
+          console.log(`✓ Help reminder posted (${remindersThisWeek}/${REMINDERS_PER_WEEK} this week): ${tweetId}`);
+        } else if (DRY_RUN) {
+          const reminderText = await generateHelpReminder();
+          console.log(`\n📢 [DRY RUN] Reminder: ${reminderText}`);
+          remindersThisWeek++;
+        }
+      } catch (e) {
+        console.error(`Help reminder error: ${e.message}`);
+        analyst.recordError('poster', e);
+      }
+    }
+
+    // Randomize interval slightly to avoid predictable posting times
+    const jitter = Math.floor(Math.random() * 2 * 60 * 60 * 1000); // up to 2 hours of jitter
+    if (TEST_MODE) break;
+    await sleep(BASE_INTERVAL_MS + jitter);
+  }
+}
+
+function getWeekStart() {
+  const now = new Date();
+  const dayOfWeek = now.getUTCDay();
+  const startOfWeek = new Date(now);
+  startOfWeek.setUTCDate(now.getUTCDate() - dayOfWeek);
+  startOfWeek.setUTCHours(0, 0, 0, 0);
+  return startOfWeek.toISOString().split('T')[0];
+}
+
+// ─── Follow-Up Accountability ──────────────────────────────
+
 function checkForPromise(mention, originalText, ourReply) {
   const promise = detectPromise(ourReply);
   if (!promise) return;
 
-  // Try to extract something investigatable from the original message
   const parsed = parseQuery(originalText);
   const queryType = parsed ? parsed.type : null;
   const queryValue = parsed ? parsed.value : null;
@@ -474,12 +624,8 @@ function checkForPromise(mention, originalText, ourReply) {
   });
 }
 
-/**
- * Process pending follow-ups: investigate what we promised, reply with results.
- */
 async function followUpLoop() {
-  // Wait 3 minutes before starting (let other loops stabilize)
-  await sleep(180_000);
+  await sleep(180_000); // 3-minute warmup
   console.log('📌 Follow-up processor started');
 
   while (true) {
@@ -495,16 +641,14 @@ async function followUpLoop() {
           let result = null;
           let replyText = null;
 
-          // If we know what to investigate, do it
           if (followUp.queryType && followUp.queryValue) {
             switch (followUp.queryType) {
               case 'address': result = await investigateAddress(followUp.queryValue); break;
-              case 'tx': result = await investigateTx(followUp.queryValue); break;
-              case 'stake': result = await investigateStake(followUp.queryValue); break;
+              case 'tx':      result = await investigateTx(followUp.queryValue);      break;
+              case 'stake':   result = await investigateStake(followUp.queryValue);   break;
             }
 
             if (result) {
-              // Use the brain to format a follow-up reply
               replyText = await respondToQuery(
                 `[FOLLOW-UP] @${followUp.username} asked: ${followUp.originalText}\n\nYou previously said you'd look into it. Now deliver the actual findings.`,
                 result
@@ -512,7 +656,6 @@ async function followUpLoop() {
             }
           }
 
-          // If no specific query or investigation failed, generate a generic follow-up
           if (!replyText) {
             replyText = await casualReply(
               `[FOLLOW-UP] @${followUp.username} asked: ${followUp.originalText}\n\n` +
@@ -535,11 +678,9 @@ async function followUpLoop() {
           markFailed(followUp.id, e.message);
         }
 
-        // Don't hammer X — wait between follow-ups
         await sleep(30_000);
       }
 
-      // Weekly cleanup of old entries
       cleanupFollowUps();
     } catch (e) {
       console.error(`Follow-up loop error: ${e.message}`);
@@ -551,11 +692,9 @@ async function followUpLoop() {
   }
 }
 
-
 // ─── Messenger Loop ─────────────────────────────────────────
 
 async function messengerLoop() {
-  // Wait 30 seconds before starting (let other services init)
   await sleep(30_000);
   console.log('📧 Messenger service started');
 
@@ -566,7 +705,6 @@ async function messengerLoop() {
         console.log('📨 Processed ' + processed + ' message(s)');
       }
       stats.consecutiveErrors = 0;
-      // Hourly report check
       await messenger.hourlyReport(stats);
     } catch (e) {
       stats.consecutiveErrors++;
@@ -579,7 +717,7 @@ async function messengerLoop() {
           'warning',
           'Last error: ' + e.message
         );
-        stats.consecutiveErrors = 0; // Reset after escalation
+        stats.consecutiveErrors = 0;
       }
     }
 
@@ -588,13 +726,11 @@ async function messengerLoop() {
   }
 }
 
-
 // ─── Analyst Loop ──────────────────────────────────────────
 
 async function analystLoop() {
-  // Wait 60 seconds before starting (let errors accumulate naturally)
   await sleep(60_000);
-  console.log('\U0001f4ca Analyst started — monitoring error patterns');
+  console.log('📊 Analyst started — monitoring error patterns');
 
   while (true) {
     try {
@@ -617,7 +753,6 @@ function sleep(ms) {
 // ─── Startup ────────────────────────────────────────────────
 
 async function main() {
-  // Initialize browser and check X login status
   let xReady = false;
   try {
     await browser.launch();
@@ -631,13 +766,13 @@ async function main() {
 ║         CARDANO WATCH TOWER  👁️              ║
 ║         We're watching.                      ║
 ╠══════════════════════════════════════════════╣
-║  Mode: ${DRY_RUN ? 'DRY RUN' : TEST_MODE ? 'TEST   ' : 'LIVE   '}                              ║
-║  X:    ${xReady ? '✓ Logged in (browser)' : '✗ Not logged in'}              ║
-║  Brain: xAI Grok (direct)                   ║
-║  Chain: Cardano mainnet                      ║
-║  Follow-ups: ${String(getPendingFollowUps().length).padEnd(3)} pending                      ║
-║  Messenger: ${messenger.isConfigured() ? "✓ Gmail SMTP" : "✗ No credentials"}                  ║
-║  Analyst:   ✓ Pattern detection + X safety       ║
+║  Mode:     ${DRY_RUN ? 'DRY RUN' : TEST_MODE ? 'TEST   ' : 'LIVE   '}                         ║
+║  X:        ${xReady ? '✓ Logged in (browser)' : '✗ Not logged in'}           ║
+║  Brain:    xAI Grok (direct)                 ║
+║  Chain:    Cardano mainnet (5M+ threshold)   ║
+║  Follow-ups: ${String(getPendingFollowUps().length).padEnd(3)} pending                    ║
+║  Messenger: ${messenger.isConfigured() ? '✓ Gmail SMTP' : '✗ No credentials'}                  ║
+║  Analyst:  ✓ Pattern detection + X safety    ║
 ╚══════════════════════════════════════════════╝
 `);
 
@@ -646,7 +781,6 @@ async function main() {
     console.log('   Once logged in, cookies persist across restarts.\n');
   }
 
-  // Restore stats from disk (survives restarts)
   loadStats();
 
   if (TEST_MODE) {
@@ -657,7 +791,6 @@ async function main() {
     process.exit(0);
   }
 
-  // Graceful shutdown
   const shutdown = async (signal) => {
     console.log('\nShutting down... (' + (signal || 'unknown') + ')');
     saveStats();
@@ -666,7 +799,7 @@ async function main() {
     process.exit(0);
   };
 
-  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGINT',  () => shutdown('SIGINT'));
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 
   // Run all loops concurrently
@@ -678,7 +811,9 @@ async function main() {
     dailyDigestLoop(),
     followUpLoop(),
     messengerLoop(),
-    analystLoop()
+    analystLoop(),
+    thoughtsLoop(),
+    helpReminderLoop(),
   ]).catch(async e => {
     console.error('Fatal error:', e);
     await messenger.escalate('Fatal crash: ' + e.message, 'critical', e.stack);

@@ -603,6 +603,34 @@ async function isConfigured() {
   }
 }
 
+
+/**
+ * Repost (retweet) a tweet by navigating to it and clicking the Repost button.
+ * @param {string} tweetUrl - Full URL of the tweet to repost
+ */
+async function retweetPost(tweetUrl) {
+  const page = await browser.getPage();
+  await browser.goto(tweetUrl);
+  await browser.sleep(2500);
+
+  const retweetBtn = await page.$('[data-testid="retweet"]');
+  if (!retweetBtn) {
+    throw new Error('Repost button not found on: ' + tweetUrl);
+  }
+  await retweetBtn.click();
+  await browser.sleep(1200);
+
+  const confirmBtn = await page.$('[data-testid="retweetConfirm"]');
+  if (!confirmBtn) {
+    throw new Error('Repost confirm button not found');
+  }
+  await confirmBtn.click();
+  await browser.sleep(1500);
+
+  console.log('  Reposted: ' + tweetUrl);
+  return true;
+}
+
 // Wrap browser-using functions with lock to prevent concurrent Chrome navigation
 module.exports = {
   postTweet: (...args) => withLock(() => postTweet(...args)),
@@ -616,6 +644,7 @@ module.exports = {
   likeTweet: (...args) => withLock(() => likeTweet(...args)),
   followUser: (...args) => withLock(() => followUser(...args)),
   getFollowers: (...args) => withLock(() => getFollowers(...args)),
+  retweetPost: (...args) => withLock(() => retweetPost(...args)),
   attachImage,
   BOT_USERNAME
 };

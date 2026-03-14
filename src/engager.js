@@ -1,33 +1,101 @@
 /**
  * ENGAGER — Proactive community engagement for CardanoWatchTower
  *
- * Browser-based. No API calls for search/like/follow.
+ * Browser-based. No API calls for search/like/follow/repost.
  *
- * Three behaviors:
- *   1. Search & Reply  — finds Cardano conversations, drops knowledge
- *   2. Like & Amplify  — likes relevant tweets, builds presence
- *   3. Follow Back     — follows anyone who follows us
+ * Behaviors:
+ *   1. Search & Reply     — finds Cardano conversations, drops knowledge (7-12 replies/day)
+ *   2. Like & Amplify     — likes relevant tweets
+ *   3. Selective Follow   — proactively finds quality Cardano accounts (5-10/day)
+ *   4. Repost             — reposts the best content found in searches (5-10/day)
+ *
+ * Daily caps persist in daily-stats.json to survive restarts.
  *
  * COST OPTIMIZATION:
- *   - Old: called Grok for EVERY tweet to decide action (~96 calls/day)
- *   - New: keyword filter first, only call Grok for tweets that pass
- *   - Cuts Grok usage by ~80%
+ *   - Keyword filter first, only call Grok for tweets that pass
+ *   - Cuts Grok usage by ~80% vs evaluating every tweet
  */
-const { searchTweets, likeTweet, followUser, getFollowers, BOT_USERNAME } = require('./poster');
+const { searchTweets, likeTweet, followUser, retweetPost, BOT_USERNAME } = require('./poster');
 const { chat } = require('./brain');
 const { parseQuery, investigate } = require('./investigator');
+const fs = require('fs');
+const path = require('path');
 
-// Track what we've already engaged with (in-memory, resets on restart)
+// Track what we've engaged with this session (in-memory dedup)
 const engaged = {
   replied: new Set(),
   liked: new Set(),
-  followed: new Set()
+  followed: new Set(),
+  reposted: new Set()
 };
 
-// Daily follow cap — protects account from looking botty
-const DAILY_FOLLOW_CAP = 20;
-let dailyFollowCount = 0;
-let dailyFollowReset = Date.now() + 24 * 60 * 60 * 1000;
+// ── Daily caps — loaded from and saved to disk to survive restarts ──
+const STATS_FILE = path.join(__dirname, '..', 'daily-stats.json');
+
+const DAILY_CAPS = {
+  follows:  { min: 5,  max: 10 },   // 5-10 new follows per day
+  reposts:  { min: 5,  max: 10 },   // 5-10 reposts per day
+  replies:  { min: 7,  max: 12 },   // 7-12 engagement replies per day
+};
+
+// Randomized target for today (re-randomizes each day)
+let todayTargets = null;
+let todayCounts = { follows: 0, reposts: 0, replies: 0 };
+let lastResetDate = null;
+
+function loadDailyCounts() {
+  try {
+    if (fs.existsSync(STATS_FILE)) {
+      const saved = JSON.parse(fs.readFileSync(STATS_FILE, 'utf8'));
+      const today = new Date().toISOString().split('T')[0];
+      if (saved.date === today) {
+        todayCounts = {
+          follows: saved.engagementFollows || 0,
+          reposts: saved.engagementReposts || 0,
+          replies: saved.engagementReplies || 0
+        };
+        lastResetDate = today;
+      }
+    }
+  } catch (e) { /* fresh start */ }
+
+  if (!lastResetDate) resetDailyCounts();
+}
+
+function resetDailyCounts() {
+  const today = new Date().toISOString().split('T')[0];
+  if (lastResetDate === today) return; // already reset today
+
+  lastResetDate = today;
+  todayCounts = { follows: 0, reposts: 0, replies: 0 };
+  todayTargets = {
+    follows: randomBetween(DAILY_CAPS.follows.min, DAILY_CAPS.follows.max),
+    reposts: randomBetween(DAILY_CAPS.reposts.min, DAILY_CAPS.reposts.max),
+    replies: randomBetween(DAILY_CAPS.replies.min, DAILY_CAPS.replies.max),
+  };
+  console.log(`📊 Engagement targets today — follows: ${todayTargets.follows}, reposts: ${todayTargets.reposts}, replies: ${todayTargets.replies}`);
+}
+
+function saveDailyCounts() {
+  try {
+    if (fs.existsSync(STATS_FILE)) {
+      const saved = JSON.parse(fs.readFileSync(STATS_FILE, 'utf8'));
+      saved.engagementFollows = todayCounts.follows;
+      saved.engagementReposts = todayCounts.reposts;
+      saved.engagementReplies = todayCounts.replies;
+      fs.writeFileSync(STATS_FILE, JSON.stringify(saved, null, 2));
+    }
+  } catch (e) { /* ignore */ }
+}
+
+function randomBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function capReached(type) {
+  if (!todayTargets) resetDailyCounts();
+  return todayCounts[type] >= todayTargets[type];
+}
 
 // Search queries to rotate through
 const SEARCH_QUERIES = [
@@ -39,7 +107,13 @@ const SEARCH_QUERIES = [
   'Cardano on-chain',
   'Cardano wallet moved',
   'Cardano treasury',
-  'Cardano transaction'
+  'Cardano transaction',
+  'Cardano staking',
+  'ADA movement',
+  'Cardano DeFi',
+  'Cardano protocol',
+  'Cardano community',
+  'ADA blockchain',
 ];
 
 // Keywords that indicate a tweet is worth engaging with
@@ -47,63 +121,71 @@ const ENGAGEMENT_KEYWORDS = [
   'whale', 'moved', 'transfer', 'staking', 'delegation', 'drep',
   'governance', 'treasury', 'suspicious', 'rug', 'scam', 'alert',
   'on-chain', 'wallet', 'stakekey', 'transaction', 'tx',
-  'ada', '₳', 'million', 'billion', 'withdrawal', 'deposit'
+  'ada', 'cardano', 'million', 'billion', 'withdrawal', 'deposit',
+  'pool', 'stake', 'epoch', 'block', 'validator', 'drep', 'vote'
 ];
 
 let searchIndex = 0;
 
 /**
  * Main engagement cycle. Call this periodically.
- * Returns { searched, liked, replied, followed } counts.
+ * Returns { searched, liked, replied, followed, reposted } counts.
  */
 async function engage() {
-  const results = { searched: 0, liked: 0, replied: 0, followed: 0 };
+  // Check and reset daily caps if needed
+  resetDailyCounts();
+  loadDailyCounts();
+
+  const results = { searched: 0, liked: 0, replied: 0, followed: 0, reposted: 0 };
 
   try {
     await searchAndEngage(results);
-    await followBack(results);
+    await findAndFollowQualityAccounts(results);
   } catch (e) {
     console.error(`Engagement error: ${e.message}`);
   }
 
+  saveDailyCounts();
   return results;
 }
 
 /**
  * Search for Cardano tweets and engage with the best ones.
- * Uses keyword filter FIRST to avoid burning Grok calls on junk.
+ * Handles replies, likes, and reposts within daily caps.
  */
 async function searchAndEngage(results) {
   const query = SEARCH_QUERIES[searchIndex % SEARCH_QUERIES.length];
   searchIndex++;
 
   console.log(`🔍 Searching: ${query}`);
-  const tweets = await searchTweets(query, 10);
+  const tweets = await searchTweets(query, 15);
   results.searched = tweets.length;
 
   // Keyword filter — only send to Grok if the tweet has substance
   const filtered = tweets.filter(tweet => {
     if (tweet.authorUsername === BOT_USERNAME) return false;
-    if (engaged.liked.has(tweet.id) || engaged.replied.has(tweet.id)) return false;
+    if (engaged.liked.has(tweet.id) && engaged.replied.has(tweet.id)) return false;
 
     const lower = tweet.text.toLowerCase();
     return ENGAGEMENT_KEYWORDS.some(kw => lower.includes(kw));
   });
 
-  // Only call Grok for filtered tweets (saves ~80% of API calls)
-  for (const tweet of filtered.slice(0, 3)) { // max 3 Grok calls per cycle
+  // Evaluate up to 3 tweets with Grok per cycle
+  for (const tweet of filtered.slice(0, 3)) {
     const action = await decideAction(tweet);
 
-    if (action === 'reply') {
+    if (action === 'reply' && !capReached('replies')) {
       await handleReply(tweet, results);
-    } else if (action === 'like') {
+    } else if (action === 'repost' && !capReached('reposts') && !engaged.reposted.has(tweet.id)) {
+      await handleRepost(tweet, results);
+    } else if (!engaged.liked.has(tweet.id)) {
       await handleLike(tweet, results);
     }
 
-    await sleep(3000); // slower pace for browser
+    await sleep(3000);
   }
 
-  // Like a few more (cap at 3 to keep Chrome available for mentions)
+  // Like a few more without Grok evaluation
   let extraLikes = 0;
   for (const tweet of filtered.slice(3)) {
     if (extraLikes >= 3) break;
@@ -117,29 +199,35 @@ async function searchAndEngage(results) {
 
 /**
  * Ask the brain what to do with this tweet.
- * Returns: 'reply', 'like', or 'skip'
+ * Returns: 'reply', 'repost', 'like', or 'skip'
  */
 async function decideAction(tweet) {
   const prompt = `You're CardanoWatchTower. Here's a tweet:
 
 "${tweet.text}"
+Author: @${tweet.authorUsername || 'unknown'}
 
-Should we engage? Consider:
-- Does this discuss something we could add value to about the CARDANO BLOCKCHAIN?
-- Is the author asking a question we could answer with CARDANO on-chain data?
-- Would engaging look natural and helpful, NOT spammy?
-- If the tweet is about a non-Cardano chain (Solana, Ethereum, BSC, etc.) or a memecoin/token that just happens to be named "Cardano" but is NOT on the Cardano blockchain, SKIP it.
-- If addresses in the tweet don't start with addr1, stake1, drep1, pool1, Ae2, or Ddz — they are NOT Cardano addresses. SKIP.
+What should we do? Consider:
+- REPLY: if we can add genuine value, answer a question, or share relevant on-chain data
+- REPOST: if this is high-quality Cardano content that our followers would benefit from seeing (informative, insightful, interesting — not just hype or price talk)
+- LIKE: if it's good but doesn't warrant reply or repost
+- SKIP: if it's not Cardano-related, spam, price shilling, or we can't add value
 
-Respond with ONLY one word: REPLY, LIKE, or SKIP`;
+Rules:
+- If the tweet discusses a non-Cardano chain (Solana, Ethereum, BSC, etc.), SKIP it.
+- If addresses don't start with addr1, stake1, drep1, pool1, Ae2, or Ddz — they are NOT Cardano. SKIP.
+- Only REPOST content that's genuinely quality — informative, factual, or meaningfully engaging.
+- Only REPLY if we'd actually add value, not just to be visible.
+
+Respond with ONLY one word: REPLY, REPOST, LIKE, or SKIP`;
 
   try {
     const response = await chat([{ role: 'user', content: prompt }], { temperature: 0.3, maxTokens: 10 });
     const decision = response.trim().toUpperCase();
-    if (['REPLY', 'LIKE', 'SKIP'].includes(decision)) return decision.toLowerCase();
-    return 'skip';
+    if (['REPLY', 'REPOST', 'LIKE', 'SKIP'].includes(decision)) return decision.toLowerCase();
+    return 'like';
   } catch (e) {
-    return 'like'; // default to like on error (cheaper than retry)
+    return 'like';
   }
 }
 
@@ -154,13 +242,12 @@ async function handleReply(tweet, results) {
       try {
         const data = await investigate(parsed.value);
         if (data) {
-          // Format cleanly, don't dump JSON
           if (data.type === 'ADDRESS_REPORT') {
-            onChainContext = `On-chain: ${data.balance} ₳ balance, ${data.txCount} txs`;
+            onChainContext = `On-chain: ${data.balance} ADA balance, ${data.txCount} txs`;
           } else if (data.type === 'TX_REPORT') {
-            onChainContext = `On-chain: ${data.totalMoved} ₳ moved, ${data.inputCount} in → ${data.outputCount} out`;
+            onChainContext = `On-chain: ${data.totalMoved} ADA moved, ${data.inputCount} in to ${data.outputCount} out`;
           } else if (data.type === 'STAKE_REPORT') {
-            onChainContext = `On-chain: ${data.controlledAda} ₳ controlled, ${data.addressCount} addresses`;
+            onChainContext = `On-chain: ${data.controlledAda} ADA controlled, ${data.addressCount} addresses`;
           }
         }
       } catch (e) { /* no data, fine */ }
@@ -173,9 +260,9 @@ ${onChainContext ? `${onChainContext}\n` : ''}Write a reply from CardanoWatchTow
 - Be helpful and conversational. Add genuine value.
 - If we have on-chain data, share the key finding naturally.
 - If no data, share a relevant observation or offer to help.
-- NEVER fabricate on-chain data, tx counts, or analysis you don't have.
-- Valid Cardano addresses start with addr1, stake1, Ae2, Ddz, drep1, or pool1. Anything else is NOT Cardano.
-- If the tweet discusses a non-Cardano token/address (Solana, Ethereum, etc.), acknowledge it's not your chain. Don't pretend to analyze it.
+- NEVER fabricate on-chain data.
+- Valid Cardano addresses start with addr1, stake1, Ae2, Ddz, drep1, or pool1. Others are NOT Cardano.
+- If the tweet discusses a non-Cardano token or chain, acknowledge that politely.
 - NEVER include cardanoscan.io links unless we provided real on-chain data above.
 - Be a community member first, watchdog second.
 - Under 280 characters.
@@ -188,10 +275,11 @@ Reply with ONLY the tweet text.`;
     const { reply } = require('./poster');
     await reply(tweet.id || tweet.url, replyText);
     engaged.replied.add(tweet.id);
+    todayCounts.replies++;
     results.replied++;
-    console.log(`  💬 Replied: ${replyText.substring(0, 80)}...`);
+    console.log(`  💬 Replied (${todayCounts.replies}/${todayTargets.replies}): ${replyText.substring(0, 80)}...`);
 
-    // Also like the tweet we replied to
+    // Like the tweet we replied to
     try {
       await likeTweet(tweet.id || tweet.url);
       engaged.liked.add(tweet.id);
@@ -199,6 +287,22 @@ Reply with ONLY the tweet text.`;
     } catch (e) { /* no big deal */ }
   } catch (e) {
     console.error(`  Reply failed: ${e.message}`);
+  }
+}
+
+/**
+ * Repost a quality tweet.
+ */
+async function handleRepost(tweet, results) {
+  try {
+    const tweetUrl = tweet.url || `https://x.com/${tweet.authorUsername}/status/${tweet.id}`;
+    await retweetPost(tweetUrl);
+    engaged.reposted.add(tweet.id);
+    todayCounts.reposts++;
+    results.reposted++;
+    console.log(`  🔁 Reposted (${todayCounts.reposts}/${todayTargets.reposts}): @${tweet.authorUsername}`);
+  } catch (e) {
+    console.error(`  Repost failed: ${e.message}`);
   }
 }
 
@@ -217,48 +321,89 @@ async function handleLike(tweet, results) {
 }
 
 /**
- * Follow back anyone who follows us.
+ * Proactively find and follow quality Cardano community accounts.
+ * Selective — evaluates account quality before following.
+ * Replaces the old "follow back everyone" approach.
  */
-async function followBack(results) {
-  const MAX_FOLLOWS_PER_CYCLE = 3;
-
-  // Reset daily counter every 24h
-  if (Date.now() >= dailyFollowReset) {
-    dailyFollowCount = 0;
-    dailyFollowReset = Date.now() + 24 * 60 * 60 * 1000;
-  }
-
-  // Daily cap reached — skip entirely
-  if (dailyFollowCount >= DAILY_FOLLOW_CAP) {
+async function findAndFollowQualityAccounts(results) {
+  if (capReached('follows')) {
+    console.log(`  ⏸️ Follow cap reached (${todayCounts.follows}/${todayTargets.follows} today)`);
     return;
   }
 
+  const MAX_FOLLOWS_PER_CYCLE = 2; // Max follows per engagement cycle
+
+  // Search for active Cardano accounts through recent content
+  const followQueries = [
+    'Cardano ADA community',
+    'Cardano staking DRep',
+    'Cardano on-chain analysis',
+  ];
+
+  const query = followQueries[Math.floor(Math.random() * followQueries.length)];
+
   try {
-    const followers = await getFollowers(20);
+    const tweets = await searchTweets(query, 20);
     let followed = 0;
 
-    for (const follower of followers) {
-      if (followed >= MAX_FOLLOWS_PER_CYCLE || dailyFollowCount >= DAILY_FOLLOW_CAP) {
-        if (dailyFollowCount >= DAILY_FOLLOW_CAP) {
-          console.log('  ⏸️ Daily follow cap reached (' + DAILY_FOLLOW_CAP + ')');
-        }
-        break;
-      }
-      if (engaged.followed.has(follower.username)) continue;
-      if (follower.username === BOT_USERNAME) continue;
+    for (const tweet of tweets) {
+      if (followed >= MAX_FOLLOWS_PER_CYCLE || capReached('follows')) break;
+
+      const username = tweet.authorUsername;
+      if (!username || username === BOT_USERNAME) continue;
+      if (engaged.followed.has(username)) continue;
+
+      // Evaluate account quality before following
+      const shouldFollow = await evaluateAccountQuality(tweet);
+      if (!shouldFollow) continue;
 
       try {
-        await followUser(follower.username);
-        engaged.followed.add(follower.username);
+        await followUser(username);
+        engaged.followed.add(username);
+        todayCounts.follows++;
         results.followed++;
         followed++;
-        dailyFollowCount++;
-        console.log('  👤 Followed back: @' + follower.username + ' (' + dailyFollowCount + '/' + DAILY_FOLLOW_CAP + ' today)');
-        await sleep(5000); // Longer gap — gives mention loop a chance to grab the lock
-      } catch (e) { /* skip */ }
+        console.log(`  👤 Followed: @${username} (${todayCounts.follows}/${todayTargets.follows} today)`);
+        await sleep(5000);
+      } catch (e) {
+        console.error(`  Follow failed for @${username}: ${e.message}`);
+      }
     }
   } catch (e) {
-    console.error(`  Follow-back error: ${e.message}`);
+    console.error(`  Follow cycle error: ${e.message}`);
+  }
+}
+
+/**
+ * Ask the brain if this account is worth following.
+ * Looks at their recent tweet content for quality signals.
+ */
+async function evaluateAccountQuality(tweet) {
+  const prompt = `Should CardanoWatchTower follow this account based on this tweet?
+
+Tweet: "${tweet.text}"
+Author: @${tweet.authorUsername || 'unknown'}
+
+Evaluate whether this account is worth following. Good follows are:
+- Actively posting meaningful Cardano content (governance, staking, on-chain data, ecosystem news)
+- Informative about Cardano — technical, analytical, or educational content
+- Fun Cardano content — community members, educators, builders
+- Engaged in the Cardano community — replying, discussing, contributing
+- Active accounts (posting regularly, not dormant)
+
+Do NOT follow:
+- Accounts posting generic price talk, moon predictions, or hype without substance
+- Non-Cardano accounts (unless heavily Cardano-focused)
+- Accounts that appear to be spam or bot-like
+- Accounts with no visible Cardano focus
+
+Respond with ONLY one word: FOLLOW or SKIP`;
+
+  try {
+    const response = await chat([{ role: 'user', content: prompt }], { temperature: 0.3, maxTokens: 10 });
+    return response.trim().toUpperCase() === 'FOLLOW';
+  } catch (e) {
+    return false; // Skip on error — only follow when confident
   }
 }
 
@@ -266,4 +411,8 @@ function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
-module.exports = { engage, SEARCH_QUERIES };
+// Initialize on module load
+loadDailyCounts();
+if (!todayTargets) resetDailyCounts();
+
+module.exports = { engage, getDailyCounts: () => todayCounts, getDailyTargets: () => todayTargets, SEARCH_QUERIES };
