@@ -19,6 +19,44 @@ const fs = require('fs');
 const path = require('path');
 
 const BOT_USERNAME = process.env.BOT_HANDLE || process.env.X_USERNAME || 'CardanoWatchers';
+// === Global Tweet Rate Limiter (new account safety) ===
+const MIN_TWEET_GAP_MS = 5 * 60 * 1000;  // 5 minutes between any two tweets
+const MAX_DAILY_TWEETS = 15;               // Hard cap: 15 tweets/day total
+let _lastPostTime = 0;
+let _dailyTweetCount = 0;
+let _dailyResetDate = new Date().toISOString().split('T')[0];
+
+function _checkRateLimit() {
+  // Reset daily counter at midnight UTC
+  const today = new Date().toISOString().split('T')[0];
+  if (today !== _dailyResetDate) {
+    _dailyTweetCount = 0;
+    _dailyResetDate = today;
+  }
+
+  // Daily cap
+  if (_dailyTweetCount >= MAX_DAILY_TWEETS) {
+    console.log(`⏸️  Daily tweet cap reached (${_dailyTweetCount}/${MAX_DAILY_TWEETS}). Skipping.`);
+    return false;
+  }
+
+  // Minimum gap between tweets
+  const elapsed = Date.now() - _lastPostTime;
+  if (elapsed < MIN_TWEET_GAP_MS) {
+    const waitSec = Math.ceil((MIN_TWEET_GAP_MS - elapsed) / 1000);
+    console.log(`⏸️  Tweet rate limit: waiting ${waitSec}s before next post...`);
+    return waitSec;  // Return seconds to wait
+  }
+
+  return true;  // Good to go
+}
+
+function _recordPost() {
+  _lastPostTime = Date.now();
+  _dailyTweetCount++;
+  console.log(`📊 Tweet ${_dailyTweetCount}/${MAX_DAILY_TWEETS} today`);
+}
+
 
 // === Image Attachment ===
 
@@ -122,8 +160,13 @@ async function postTweet(text, options = null) {
     return await replyToTweet(replyToId, text, imagePath);
   }
 
-  // Fresh Chrome — kill stale X JS, restore cookies, clean slate
-  await browser.close();
+  // Rate limit check — new account safety
+  const rateCheck = _checkRateLimit();
+  if (rateCheck === false) return false;  // Daily cap hit
+  if (typeof rateCheck === 'number') {
+    await new Promise(r => setTimeout(r, rateCheck * 1000));  // Wait for gap
+  }
+
   const page = await browser.getPage();
 
   // Navigate to home
@@ -166,6 +209,7 @@ async function postTweet(text, options = null) {
     // Save cookies after posting
     await browser.saveCookies();
 
+    _recordPost();
     console.log(`✓ Posted tweet${imagePath ? ' (with image)' : ''}: ${text.substring(0, 80)}...`);
     return true;
   } catch (e) {
@@ -187,8 +231,13 @@ async function postTweet(text, options = null) {
  * @param {string|null} imagePath - Optional image to attach
  */
 async function replyToTweet(tweetId, text, imagePath = null) {
-  // Fresh Chrome — kill stale X JS, restore cookies, clean slate
-  await browser.close();
+  // Rate limit check — new account safety
+  const rateCheck = _checkRateLimit();
+  if (rateCheck === false) return false;  // Daily cap hit
+  if (typeof rateCheck === 'number') {
+    await new Promise(r => setTimeout(r, rateCheck * 1000));  // Wait for gap
+  }
+
   const page = await browser.getPage();
 
   // Ensure viewport is tall enough for reply UI
@@ -274,6 +323,7 @@ async function replyToTweet(tweetId, text, imagePath = null) {
 
     await browser.sleep(5000);
     await browser.saveCookies();
+    _recordPost();
     console.log(`✓ Replied to ${tweetId}${imagePath ? ' (with image)' : ''}: ${text.substring(0, 80)}...`);
     return true;
   } catch (e) {

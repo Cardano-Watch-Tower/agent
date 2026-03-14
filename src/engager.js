@@ -35,7 +35,7 @@ const STATS_FILE = path.join(__dirname, '..', 'daily-stats.json');
 const DAILY_CAPS = {
   follows:  { min: 5,  max: 10 },   // 5-10 new follows per day
   reposts:  { min: 5,  max: 10 },   // 5-10 reposts per day
-  replies:  { min: 7,  max: 12 },   // 7-12 engagement replies per day
+  replies:  { min: 3,  max: 5 },    // 3-5 engagement replies per day (new account safety)
 };
 
 // Randomized target for today (re-randomizes each day)

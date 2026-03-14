@@ -44,7 +44,7 @@ const ENGAGE_POLL_MS   = 15 * 60_000;  // 15 minutes
 const FOLLOWUP_POLL_MS = 2 * 60_000;   // 2 minutes
 const MESSENGER_POLL_MS = 60_000;      // 60 seconds
 const ANALYST_POLL_MS  = 5 * 60_000;   // 5 minutes
-const THOUGHT_POLL_MS  = 90 * 60_000;  // 90 minutes (7-12 posts/day spread over 24h)
+const THOUGHT_POLL_MS  = 180 * 60_000; // 180 minutes (3-5 posts/day, new account safety)
 const DAILY_DIGEST_HOUR = 0;           // midnight UTC
 
 // Runtime stats for daily digest — persisted to disk so restarts don't wipe them
@@ -481,7 +481,7 @@ async function thoughtsLoop() {
   await sleep(300_000); // 5-minute warmup
 
   // Randomize daily target for thoughts
-  const dailyThoughtsTarget = Math.floor(Math.random() * 6) + 7; // 7-12
+  const dailyThoughtsTarget = Math.floor(Math.random() * 3) + 3; // 3-5 (new account safety)
   let thoughtsToday = 0;
   let thoughtsResetDate = new Date().toISOString().split('T')[0];
 
@@ -496,7 +496,7 @@ async function thoughtsLoop() {
       thoughtsToday = 0;
       thoughtsResetDate = today;
       // New random target for the day
-      const newTarget = Math.floor(Math.random() * 6) + 7;
+      const newTarget = Math.floor(Math.random() * 3) + 3;
       console.log(`💭 New day — thoughts target: ${newTarget}`);
     }
 
