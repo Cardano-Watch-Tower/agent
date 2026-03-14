@@ -171,7 +171,7 @@ async function searchAndEngage(results) {
   });
 
   // Evaluate up to 3 tweets with Grok per cycle
-  for (const tweet of filtered.slice(0, 3)) {
+  for (const tweet of filtered.slice(0, 1)) { // max 1 per cycle on new account
     const action = await decideAction(tweet);
 
     if (action === 'reply' && !capReached('replies')) {
@@ -182,17 +182,17 @@ async function searchAndEngage(results) {
       await handleLike(tweet, results);
     }
 
-    await sleep(3000);
+    await sleep(7000);
   }
 
   // Like a few more without Grok evaluation
   let extraLikes = 0;
   for (const tweet of filtered.slice(3)) {
-    if (extraLikes >= 3) break;
+    if (extraLikes >= 2) break; // keep it slow on new account
     if (!engaged.liked.has(tweet.id)) {
       await handleLike(tweet, results);
       extraLikes++;
-      await sleep(3000);
+      await sleep(7000);
     }
   }
 }
@@ -364,7 +364,7 @@ async function findAndFollowQualityAccounts(results) {
         results.followed++;
         followed++;
         console.log(`  👤 Followed: @${username} (${todayCounts.follows}/${todayTargets.follows} today)`);
-        await sleep(5000);
+        await sleep(10000);
       } catch (e) {
         console.error(`  Follow failed for @${username}: ${e.message}`);
       }

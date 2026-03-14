@@ -305,6 +305,36 @@ async function isLoggedIn() {
 }
 
 /**
+ * Wait for any of the given selectors to appear. Returns the selector that matched.
+ */
+async function waitForAny(page, selectors, timeoutMs = 10000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    for (const sel of selectors) {
+      const el = await page.$(sel);
+      if (el) return sel;
+    }
+    await sleep(500);
+  }
+  return null;
+}
+
+/**
+ * Click the first button whose text includes any of the given labels.
+ */
+async function clickButtonWithText(page, labels) {
+  const buttons = await page.$$('button');
+  for (const btn of buttons) {
+    const text = await page.evaluate(el => el.textContent || '', btn);
+    if (labels.some(l => text.includes(l))) {
+      await btn.click();
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Wait for a code to be written to a file (used for 2FA and verification).
  * Polls every 3 seconds for up to 10 minutes.
  */
@@ -350,50 +380,43 @@ async function login(username, password) {
   await page.goto('https://x.com/i/flow/login', { waitUntil: 'networkidle2', timeout: 30000 });
   await sleep(3000);
 
-  const usernameInput = await page.waitForSelector('input[autocomplete="username"]', { timeout: 10000 });
+  // Step 1: Enter username
+  const usernameInput = await page.waitForSelector('input[autocomplete="username"]', { timeout: 15000 });
   await usernameInput.type(username, { delay: 50 });
-  await sleep(500);
+  await sleep(800);
 
-  const nextButtons = await page.$$('button');
-  for (const btn of nextButtons) {
-    const text = await page.evaluate(el => el.textContent, btn);
-    if (text.includes('Next')) {
-      await btn.click();
-      break;
-    }
+  await clickButtonWithText(page, ['Next']);
+  await sleep(3000);
+
+  // Step 2: X may show a verification step before password (OCF flow)
+  // Wait for EITHER the verification input OR the password input
+  const afterUsername = await waitForAny(page, [
+    'input[data-testid="ocfEnterTextTextInput"]',
+    'input[autocomplete="current-password"]'
+  ], 12000);
+
+  if (!afterUsername) {
+    await screenshot('login-after-username');
+    throw new Error('Login stuck — neither verification nor password input appeared after username');
   }
-  await sleep(2000);
 
-  const verifyInput = await page.$('input[data-testid="ocfEnterTextTextInput"]');
-  if (verifyInput) {
-    console.log('⚠️  X is asking for email/phone verification.');
-    console.log('    Write your code to /tmp/x_code.txt to continue...');
+  if (afterUsername === 'input[data-testid="ocfEnterTextTextInput"]') {
+    console.log('⚠️  X is asking for email/username verification.');
+    console.log('    Write your verification input to /tmp/x_code.txt to continue...');
+    const verifyInput = await page.$('input[data-testid="ocfEnterTextTextInput"]');
     const code = await waitForCodeFile('/tmp/x_code.txt');
     await verifyInput.type(code.trim(), { delay: 50 });
     await sleep(500);
-    const nextButtons2 = await page.$$('button');
-    for (const btn of nextButtons2) {
-      const text = await page.evaluate(el => el.textContent, btn);
-      if (text.includes('Next') || text.includes('Verify') || text.includes('Confirm')) {
-        await btn.click();
-        break;
-      }
-    }
-    await sleep(2000);
+    await clickButtonWithText(page, ['Next', 'Verify', 'Confirm']);
+    await sleep(3000);
   }
 
-  const passwordInput = await page.waitForSelector('input[autocomplete="current-password"]', { timeout: 10000 });
+  // Step 3: Password
+  const passwordInput = await page.waitForSelector('input[autocomplete="current-password"]', { timeout: 15000 });
   await passwordInput.type(password, { delay: 50 });
   await sleep(500);
 
-  const loginButtons = await page.$$('button');
-  for (const btn of loginButtons) {
-    const text = await page.evaluate(el => el.textContent, btn);
-    if (text.includes('Log in')) {
-      await btn.click();
-      break;
-    }
-  }
+  await clickButtonWithText(page, ['Log in']);
 
   await sleep(4000);
 
