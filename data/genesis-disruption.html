@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d1117; font-family: 'Segoe UI', Arial, sans-serif; }
+  .container { width: 1200px; padding: 40px; }
+
+  h1 { color: #e6edf3; font-size: 28px; text-align: center; margin-bottom: 6px; }
+  .subtitle { color: #8b949e; font-size: 14px; text-align: center; margin-bottom: 30px; }
+
+  svg { display: block; margin: 0 auto; }
+
+  .whale-box { fill: #1a1e2e; stroke: #f97316; stroke-width: 2; rx: 10; }
+  .pool-box { fill: #1a1e2e; stroke: #3b82f6; stroke-width: 2; rx: 10; }
+  .pool-box-red { fill: #1a1e2e; stroke: #ef4444; stroke-width: 3; rx: 10; }
+  .gov-box { fill: #1a1e2e; stroke: #a855f7; stroke-width: 2; rx: 8; }
+
+  .label { fill: #e6edf3; font-size: 14px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 600; }
+  .label-sm { fill: #8b949e; font-size: 11px; font-family: 'Segoe UI', Arial, sans-serif; }
+  .label-amt { fill: #f97316; font-size: 13px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 700; }
+  .label-reward { fill: #22c55e; font-size: 12px; font-family: 'Segoe UI', Arial, sans-serif; }
+  .label-pool { fill: #3b82f6; font-size: 14px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 700; }
+  .label-pool-red { fill: #ef4444; font-size: 14px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 700; }
+  .label-stat { fill: #8b949e; font-size: 11px; font-family: 'Segoe UI', Arial, sans-serif; }
+  .label-warn { fill: #ef4444; font-size: 13px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 700; }
+  .label-white { fill: #e6edf3; font-size: 12px; font-family: 'Segoe UI', Arial, sans-serif; }
+  .label-purple { fill: #a855f7; font-size: 12px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 600; }
+  .label-drep { fill: #f59e0b; font-size: 10px; font-family: 'Segoe UI', Arial, sans-serif; }
+
+  .arrow-line-blue { stroke: #3b82f6; stroke-width: 2; fill: none; }
+  .arrow-line-red { stroke: #ef4444; stroke-width: 3; fill: none; stroke-dasharray: 8 4; }
+  .arrow-line-purple { stroke: #a855f7; stroke-width: 2; fill: none; stroke-dasharray: 6 3; }
+
+  .owns-label { fill: #ef4444; font-size: 12px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 700; }
+
+  .callout { fill: #2a1a1a; stroke: #ef4444; stroke-width: 2; rx: 8; }
+  .callout-text { fill: #ef4444; font-size: 13px; font-family: 'Segoe UI', Arial, sans-serif; font-weight: 600; }
+
+  .footer { color: #484f58; font-size: 11px; text-align: center; margin-top: 20px; }
+  .footer span { color: #f97316; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Genesis Disruption: Delegation, Pool Control &amp; Governance</h1>
+  <p class="subtitle">Voucher sale whale stakekeys &mdash; 47.6M ADA of genesis allocation &mdash; delegation flows, pool ownership, SPO voting power</p>
+
+  <svg width="1120" height="830" viewBox="0 0 1120 830">
+    <!-- GENESIS BLOCK -->
+    <rect x="410" y="10" width="300" height="45" rx="8" fill="#1a1e2e" stroke="#8b949e" stroke-width="1"/>
+    <text x="560" y="38" text-anchor="middle" class="label" style="font-size:15px;">Genesis Allocation &#8594; Voucher Sale</text>
+
+    <!-- Line from genesis down -->
+    <line x1="560" y1="55" x2="560" y2="80" stroke="#484f58" stroke-width="1" stroke-dasharray="4 3"/>
+
+    <!-- WHALE 1 - BIG ONE -->
+    <rect x="30" y="90" width="260" height="95" class="whale-box"/>
+    <text x="160" y="113" text-anchor="middle" class="label">Whale #1</text>
+    <text x="160" y="133" text-anchor="middle" class="label-amt">38,362,976 ADA</text>
+    <text x="160" y="150" text-anchor="middle" class="label-reward">+6,266,830 ADA rewards</text>
+    <text x="160" y="165" text-anchor="middle" class="label-sm">stake1u9f9v0z...ssjfnkzz</text>
+    <text x="160" y="179" text-anchor="middle" class="label-drep">DRep: always_abstain</text>
+
+    <!-- WHALE 2 -->
+    <rect x="320" y="90" width="220" height="95" class="whale-box"/>
+    <text x="430" y="113" text-anchor="middle" class="label">Whale #2</text>
+    <text x="430" y="133" text-anchor="middle" class="label-amt">2,194,606 ADA</text>
+    <text x="430" y="150" text-anchor="middle" class="label-reward">+259,380 ADA rewards</text>
+    <text x="430" y="165" text-anchor="middle" class="label-sm">stake179pen...sggrke2g</text>
+    <text x="430" y="179" text-anchor="middle" class="label-drep">DRep: NONE</text>
+
+    <!-- WHALE 3 -->
+    <rect x="570" y="90" width="220" height="95" class="whale-box"/>
+    <text x="680" y="113" text-anchor="middle" class="label">Whale #3</text>
+    <text x="680" y="133" text-anchor="middle" class="label-amt">4,561,049 ADA</text>
+    <text x="680" y="150" text-anchor="middle" class="label-reward">+142,523 ADA rewards</text>
+    <text x="680" y="165" text-anchor="middle" class="label-sm">stake1ux7pp...2ssw6paf</text>
+    <text x="680" y="179" text-anchor="middle" class="label-drep">DRep: always_abstain</text>
+
+    <!-- WHALE 4 -->
+    <rect x="820" y="90" width="220" height="95" class="whale-box"/>
+    <text x="930" y="113" text-anchor="middle" class="label">Whale #4</text>
+    <text x="930" y="133" text-anchor="middle" class="label-amt">771,921 ADA</text>
+    <text x="930" y="150" text-anchor="middle" class="label-reward">+11,486 ADA rewards</text>
+    <text x="930" y="165" text-anchor="middle" class="label-sm">stake1uy22x...6gc3y95z</text>
+    <text x="930" y="179" text-anchor="middle" class="label-drep">DRep: always_abstain</text>
+
+    <!-- WHALE 5 (below whale 4) -->
+    <rect x="820" y="205" width="220" height="95" class="whale-box"/>
+    <text x="930" y="228" text-anchor="middle" class="label">Whale #5</text>
+    <text x="930" y="248" text-anchor="middle" class="label-amt">1,720,152 ADA</text>
+    <text x="930" y="265" text-anchor="middle" class="label-reward">+5,064 ADA rewards</text>
+    <text x="930" y="280" text-anchor="middle" class="label-sm">stake1uxuqr...rst8tgtg</text>
+    <text x="930" y="294" text-anchor="middle" class="label-drep">DRep: always_abstain</text>
+
+    <!-- DELEGATION ARROWS -->
+
+    <!-- Whale 1 -> MIN pool (self-delegation, red dashed = OWNS) -->
+    <path d="M 160 185 L 160 390" class="arrow-line-red" marker-end="url(#arrowRed)"/>
+    <text x="105" y="330" class="owns-label" transform="rotate(-90,105,330)">OWNS &amp; SELF-DELEGATES</text>
+
+    <!-- Whale 2 -> SMILE pool -->
+    <path d="M 430 185 L 430 390" class="arrow-line-blue" marker-end="url(#arrowBlue)"/>
+
+    <!-- Whale 3 -> SMILE pool -->
+    <path d="M 680 185 L 530 390" class="arrow-line-blue" marker-end="url(#arrowBlue)"/>
+
+    <!-- Whale 4 -> PPTG1 pool -->
+    <path d="M 900 185 L 740 390" class="arrow-line-blue" marker-end="url(#arrowBlue)"/>
+
+    <!-- Whale 5 -> WRM01 pool -->
+    <path d="M 960 300 L 960 390" class="arrow-line-blue" marker-end="url(#arrowBlue)"/>
+
+    <!-- POOL: MIN (Minswap) - RED border = problem -->
+    <rect x="30" y="400" width="280" height="130" class="pool-box-red"/>
+    <text x="170" y="423" text-anchor="middle" class="label-pool-red">MIN (Minswap)</text>
+    <text x="170" y="442" text-anchor="middle" class="label-warn">100% MARGIN</text>
+    <text x="170" y="459" text-anchor="middle" class="label-stat">Live Stake: 39.2M ADA</text>
+    <text x="170" y="474" text-anchor="middle" class="label-stat">Blocks Minted: 12,446</text>
+    <text x="170" y="489" text-anchor="middle" class="label-stat">Delegators: 95 (get 0 rewards)</text>
+    <text x="170" y="504" text-anchor="middle" class="label-stat">Owner = Whale #1</text>
+    <text x="170" y="522" text-anchor="middle" class="label-purple">SPO Vote Weight: 39.2M ADA</text>
+
+    <!-- POOL: SMILE -->
+    <rect x="340" y="400" width="240" height="115" class="pool-box"/>
+    <text x="460" y="423" text-anchor="middle" class="label-pool">SMILE</text>
+    <text x="460" y="440" text-anchor="middle" class="label-white">Smiles On Africa</text>
+    <text x="460" y="457" text-anchor="middle" class="label-stat">Live Stake: 7.6M ADA</text>
+    <text x="460" y="472" text-anchor="middle" class="label-stat">Margin: 3% | Blocks: 1,917</text>
+    <text x="460" y="487" text-anchor="middle" class="label-stat">Whales #2 + #3 = 6.8M ADA here</text>
+    <text x="460" y="507" text-anchor="middle" class="label-purple">SPO Vote Weight: 7.6M ADA</text>
+
+    <!-- POOL: PPTG1 -->
+    <rect x="610" y="400" width="240" height="115" class="pool-box"/>
+    <text x="730" y="423" text-anchor="middle" class="label-pool">PPTG1</text>
+    <text x="730" y="440" text-anchor="middle" class="label-white">P2P &amp; Tangem</text>
+    <text x="730" y="457" text-anchor="middle" class="label-stat">Live Stake: 64M ADA</text>
+    <text x="730" y="472" text-anchor="middle" class="label-stat">Margin: 4% | Blocks: 875</text>
+    <text x="730" y="487" text-anchor="middle" class="label-stat">Whale #4: 772K ADA here</text>
+    <text x="730" y="507" text-anchor="middle" class="label-purple">SPO Vote Weight: 64M ADA</text>
+
+    <!-- POOL: WRM01 -->
+    <rect x="880" y="400" width="220" height="115" class="pool-box"/>
+    <text x="990" y="423" text-anchor="middle" class="label-pool">WRM01</text>
+    <text x="990" y="440" text-anchor="middle" class="label-white">WingRiders</text>
+    <text x="990" y="457" text-anchor="middle" class="label-stat">Live Stake: 4.1M ADA</text>
+    <text x="990" y="472" text-anchor="middle" class="label-stat">Margin: 1% | Blocks: 893</text>
+    <text x="990" y="487" text-anchor="middle" class="label-stat">Whale #5: 1.7M ADA here</text>
+    <text x="990" y="507" text-anchor="middle" class="label-purple">SPO Vote Weight: 4.1M ADA</text>
+
+    <!-- GOVERNANCE BOX -->
+    <rect x="30" y="545" width="1060" height="55" class="gov-box"/>
+    <text x="560" y="568" text-anchor="middle" class="label-purple" style="font-size:14px;">GOVERNANCE IMPACT: SPO Voting Power</text>
+    <text x="560" y="588" text-anchor="middle" class="label-white" style="font-size:12px;">All 5 whales set DRep to "always_abstain" &mdash; but their delegated stake gives SPOs voting power. MIN pool operator (Whale #1) votes with 39.2M ADA backing.</text>
+
+    <!-- CALLOUT BOX -->
+    <rect x="30" y="620" width="1060" height="190" class="callout"/>
+    <text x="560" y="648" text-anchor="middle" class="callout-text" style="font-size:16px;">KEY FINDINGS: Genesis Disruption</text>
+
+    <text x="50" y="675" class="label-white" style="font-size:12px;">1.</text>
+    <text x="65" y="675" class="label-white" style="font-size:12px;">Whale #1 received 38.4M ADA from genesis voucher sale, created MIN pool at 100% margin, self-delegates. All rewards go to operator.</text>
+
+    <text x="50" y="697" class="label-white" style="font-size:12px;">2.</text>
+    <text x="65" y="697" class="label-white" style="font-size:12px;">6.27M ADA extracted in lifetime staking rewards. 95 other delegators to MIN receive zero. 12,446 blocks minted.</text>
+
+    <text x="50" y="719" class="label-white" style="font-size:12px;">3.</text>
+    <text x="65" y="719" class="label-white" style="font-size:12px;">Whale #1 is also the MIN pool SPO &mdash; votes on governance actions with 39.2M ADA of backing. DRep set to "always_abstain."</text>
+
+    <text x="50" y="741" class="label-white" style="font-size:12px;">4.</text>
+    <text x="65" y="741" class="label-white" style="font-size:12px;">Whales #2 &amp; #3 concentrate 6.8M ADA on SMILE pool. No cycling detected &mdash; all positions are permanent since initial delegation.</text>
+
+    <text x="50" y="763" class="label-white" style="font-size:12px;">5.</text>
+    <text x="65" y="763" class="label-white" style="font-size:12px;">Combined: 47.6M ADA of genesis stake across 4 pools. These whales abstain from DRep voting but empower pool operators as SPO voters.</text>
+
+    <text x="50" y="785" class="label-white" style="font-size:12px;">6.</text>
+    <text x="65" y="785" class="label-white" style="font-size:12px;">Network centralization risk: a single genesis whale controls block production + SPO governance for ~39M ADA through self-dealing pool structure.</text>
+
+    <!-- Arrow markers -->
+    <defs>
+      <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
+      </marker>
+      <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
+      </marker>
+    </defs>
+  </svg>
+
+  <p class="footer">Data: Blockfrost API | Epoch 617 | Verified on-chain | <span>CardanoWatchTower</span> | All stakekeys publicly verifiable on cardanoscan.io</p>
+</div>
+</body>
+</html>

@@ -6,12 +6,12 @@
  * returns a summary.
  *
  * Capabilities:
- *   - Address lookup: balance, stake key, governance, tx count
+ *   - Address lookup: balance, stakekey, governance, tx count
  *   - TX lookup: inputs, outputs, ADA moved, timestamp
  *   - Stake key profile: pool, drep, total controlled, address count
  *   - Quick trace: follow the money 1-2 hops from an address
  */
-const { api, rateLimited } = require('./blockfrost');
+const { api, rateLimited, govFetch } = require('./blockfrost');
 const { formatAda, shortenHash } = require('./formatter');
 
 /**
@@ -40,10 +40,16 @@ function parseQuery(input) {
     for (const m of byronMatches) found.push({ type: 'address', value: m });
   }
 
-  // Extract all stake keys
+  // Extract all stakekeys
   const stakeMatches = cleaned.match(/\b(stake1[a-z0-9]{40,}|stake_[a-z0-9]{40,})\b/gi);
   if (stakeMatches) {
     for (const m of stakeMatches) found.push({ type: 'stake', value: m });
+  }
+
+  // Extract all DRep IDs
+  const drepMatches = cleaned.match(/\b(drep1[a-z0-9]{40,})\b/gi);
+  if (drepMatches) {
+    for (const m of drepMatches) found.push({ type: 'drep', value: m });
   }
 
   // Extract all pool IDs
@@ -170,7 +176,7 @@ async function investigateTx(txHash) {
 }
 
 /**
- * Investigate a stake key.
+ * Investigate a stakekey.
  */
 async function investigateStake(stakeKey) {
   const account = await rateLimited(() => api.accounts(stakeKey));
@@ -199,6 +205,74 @@ async function investigateStake(stakeKey) {
     result.addressCount = addrs.length;
   } catch (e) {
     result.addressCount = 0;
+  }
+
+  return result;
+}
+
+/**
+ * Investigate a DRep (Delegated Representative).
+ */
+async function investigateDrep(drepId) {
+  // Get DRep info
+  const info = await govFetch(`/governance/dreps/${drepId}`);
+
+  const result = {
+    type: 'DREP_REPORT',
+    drepId: drepId.substring(0, 25) + '...',
+    fullDrepId: drepId,
+    votingPower: Math.floor(Number(info.amount) / 1_000_000),
+    active: info.active,
+    retired: info.retired,
+    activeEpoch: info.active_epoch,
+    hasScript: info.has_script,
+    votes: [],
+    topDelegators: [],
+    name: null
+  };
+
+  // Get DRep metadata (name, bio)
+  try {
+    const meta = await govFetch(`/governance/dreps/${drepId}/metadata`);
+    if (meta.json_metadata) {
+      const body = meta.json_metadata.body || meta.json_metadata;
+      result.name = body.givenName || (body.dRepName && body.dRepName['@value']) || null;
+    }
+  } catch (e) { /* no metadata */ }
+
+  // Get recent votes (last 5)
+  try {
+    const votes = await govFetch(`/governance/dreps/${drepId}/votes?order=desc&count=5`);
+    for (const v of votes) {
+      let proposalType = null;
+      try {
+        const prop = await govFetch(`/governance/proposals/${v.proposal_tx_hash}/${v.proposal_cert_index}`);
+        proposalType = prop.governance_type || null;
+      } catch (e) { /* can't get proposal details */ }
+
+      result.votes.push({
+        vote: v.vote,
+        proposalId: v.proposal_id || null,
+        proposalTxHash: v.proposal_tx_hash,
+        proposalCertIndex: v.proposal_cert_index,
+        proposalType: proposalType,
+        txHash: v.tx_hash
+      });
+    }
+  } catch (e) { /* no votes */ }
+
+  // Get top delegators (by ADA amount, top 5)
+  try {
+    const delegators = await govFetch(`/governance/dreps/${drepId}/delegators?order=desc&count=20`);
+    // Sort by amount descending and take top 5
+    const sorted = delegators
+      .map(d => ({ address: d.address, ada: Math.floor(Number(d.amount) / 1_000_000) }))
+      .sort((a, b) => b.ada - a.ada)
+      .slice(0, 5);
+    result.topDelegators = sorted;
+    result.delegatorCount = delegators.length;
+  } catch (e) {
+    result.delegatorCount = 0;
   }
 
   return result;
@@ -242,6 +316,27 @@ function formatReport(result) {
       }
       break;
 
+    case 'DREP_REPORT':
+      lines.push(`🗳️ DRep Report`);
+      if (result.name) lines.push(`Name: ${result.name}`);
+      lines.push(`Voting power: ${formatAda(result.votingPower)} ₳`);
+      lines.push(`Active: ${result.active ? 'YES' : 'NO'}${result.retired ? ' (RETIRED)' : ''}`);
+      if (result.delegatorCount !== undefined) lines.push(`Delegators: ${result.delegatorCount}+`);
+      if (result.votes.length > 0) {
+        lines.push(`Recent votes:`);
+        for (const v of result.votes.slice(0, 3)) {
+          const type = v.proposalType ? ` (${v.proposalType.replace(/_/g, ' ')})` : '';
+          lines.push(`  ${v.vote.toUpperCase()}${type}`);
+        }
+      }
+      if (result.topDelegators.length > 0) {
+        lines.push(`Top delegators:`);
+        for (const d of result.topDelegators.slice(0, 3)) {
+          lines.push(`  ${formatAda(d.ada)} ₳ — ${d.address.substring(0, 20)}...`);
+        }
+      }
+      break;
+
     case 'STAKE_REPORT':
       lines.push(`🔑 Stake Key Report`);
       lines.push(`Controlled: ${formatAda(result.controlledAda)} ₳`);
@@ -271,6 +366,8 @@ async function investigate(input) {
       return await investigateTx(query.value);
     case 'stake':
       return await investigateStake(query.value);
+    case 'drep':
+      return await investigateDrep(query.value);
     case 'pool':
       return { type: 'POOL_REPORT', message: 'Pool investigation coming soon' };
     default:
@@ -278,4 +375,4 @@ async function investigate(input) {
   }
 }
 
-module.exports = { investigate, investigateAddress, investigateTx, investigateStake, formatReport, parseQuery };
+module.exports = { investigate, investigateAddress, investigateTx, investigateStake, investigateDrep, formatReport, parseQuery };

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "mmi5vn87hqga",
+    "tweetId": "2030478733979582584",
+    "username": "_ThisCr8zyLife_",
+    "originalText": "Find stakekeys with genesis funds delegated to this DRep\nhttps://cardanoscan.io/drep/drep1yg343cyuckglj48a6gpcey7fkfcy5x5f9g65wme3ne9q2mgaedmkm…",
+    "promiseText": "On it",
+    "queryType": null,
+    "queryValue": null,
+    "status": "processing",
+    "createdAt": "2026-03-08T19:44:47.192Z",
+    "deliveredAt": null,
+    "attempts": 1,
+    "maxAttempts": 3,
+    "error": null
+  },
+  {
+    "id": "mmi6bfy6d2so",
+    "tweetId": "2030478733979582584",
+    "username": "_ThisCr8zyLife_",
+    "originalText": "Find stakekeys with genesis funds delegated to this DRep\nhttps://cardanoscan.io/drep/drep1yg343cyuckglj48a6gpcey7fkfcy5x5f9g65wme3ne9q2mgaedmkm…",
+    "promiseText": "On it",
+    "queryType": null,
+    "queryValue": null,
+    "status": "processing",
+    "createdAt": "2026-03-08T19:57:04.254Z",
+    "deliveredAt": null,
+    "attempts": 1,
+    "maxAttempts": 3,
+    "error": null
+  },
+  {
+    "id": "mmif005fxl0u",
+    "tweetId": "2030478733979582584",
+    "username": "_ThisCr8zyLife_",
+    "originalText": "Find stakekeys with genesis funds delegated to this DRep\nhttps://cardanoscan.io/drep/drep1yg343cyuckglj48a6gpcey7fkfcy5x5f9g65wme3ne9q2mgaedmkm…",
+    "promiseText": "On it",
+    "queryType": null,
+    "queryValue": null,
+    "status": "failed",
+    "createdAt": "2026-03-09T00:00:07.107Z",
+    "deliveredAt": null,
+    "attempts": 3,
+    "maxAttempts": 3,
+    "error": "Requesting main frame too early!"
+  },
+  {
+    "id": "mmj24vhzf9cb",
+    "tweetId": "2030955567242457444",
+    "username": "IagonOfficial",
+    "originalText": "PSA announcement.\n\nWe will be allocating 50–55M $IAG tokens as collateral from the team token allocation wallet ($iagon.team).\n\n• These tokens will be locked for up to 2 years. \n• There will be no liquidation event associated with this loan, unless the loan is not repaid within",
+    "promiseText": "on it",
+    "queryType": null,
+    "queryValue": null,
+    "status": "delivered",
+    "createdAt": "2026-03-09T10:47:45.527Z",
+    "deliveredAt": "2026-03-09T10:59:13.850Z",
+    "attempts": 2,
+    "maxAttempts": 3,
+    "error": "Page.captureScreenshot timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+  }
+]

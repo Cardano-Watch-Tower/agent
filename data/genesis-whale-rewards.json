@@ -1,0 +1,4025 @@
+{
+  "metadata": {
+    "generatedAt": "2026-03-09T13:23:09.364Z",
+    "whalesAnalyzed": 5,
+    "genesisWhales": 0,
+    "scanMethod": "direct",
+    "description": "Genesis and whale stake key reward analysis for Cardano blockchain",
+    "purpose": "Track how much ADA has been distributed in staking rewards to large holders"
+  },
+  "summary": {
+    "totalControlledAda": 47721612,
+    "totalLifetimeRewards": 6685281,
+    "avgRewardsPerWhale": 1337056,
+    "topRewardEarner": {
+      "stakeAddress": "stake1u9f9v0z5zzlldgx58n8tklphu8mf7h4jvp2j2gddluemnssjfnkzz",
+      "rewardsAda": 6266829,
+      "controlledAda": 38451687
+    },
+    "epochRange": {
+      "earliest": 331,
+      "latest": 616
+    }
+  },
+  "whales": [
+    {
+      "stakeAddress": "stake1u9f9v0z5zzlldgx58n8tklphu8mf7h4jvp2j2gddluemnssjfnkzz",
+      "account": {
+        "stakeAddress": "stake1u9f9v0z5zzlldgx58n8tklphu8mf7h4jvp2j2gddluemnssjfnkzz",
+        "active": true,
+        "activeEpoch": 329,
+        "controlledAda": 38451687,
+        "rewardsSumAda": 6266829,
+        "withdrawalsSumAda": 6266829,
+        "reservesSumAda": 0,
+        "treasurySumAda": 0,
+        "withdrawableAda": 0,
+        "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk",
+        "drepId": "drep_always_abstain"
+      },
+      "isGenesis": false,
+      "byronAddressCount": 0,
+      "shelleyAddressCount": 40,
+      "totalAddresses": 40,
+      "sampleAddresses": {
+        "byron": [],
+        "shelley": [
+          "addr1z9tu3ecccgqlhgg2nkshfrt8td2zs8fmrwvrchgksl78x96j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq26n58l",
+          "addr1z8snz7c4974vzdpxu65ruphl3zjdvtxw8strf2c2tmqnxz2j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq0xmsha",
+          "addr1qxpej0c8707cf6awjqqp3a7jmd4qdnycuj55cjzm5d6zeljj2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq9snkvk"
+        ]
+      },
+      "governance": {
+        "drepId": "drep_always_abstain"
+      },
+      "rewardSummary": {
+        "totalEpochs": 282,
+        "firstEpoch": 331,
+        "lastEpoch": 615,
+        "totalRewardsAda": 6266829,
+        "avgRewardPerEpoch": 22223,
+        "peakEpochReward": 50016
+      },
+      "rewardHistory": [
+        {
+          "epoch": 331,
+          "reward": 26401,
+          "cumulative": 26401,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 332,
+          "reward": 42299,
+          "cumulative": 68700,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 333,
+          "reward": 39418,
+          "cumulative": 108118,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 334,
+          "reward": 34023,
+          "cumulative": 142141,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 335,
+          "reward": 33030,
+          "cumulative": 175171,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 336,
+          "reward": 37981,
+          "cumulative": 213152,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 337,
+          "reward": 29151,
+          "cumulative": 242303,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 338,
+          "reward": 40636,
+          "cumulative": 282939,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 339,
+          "reward": 49387,
+          "cumulative": 332326,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 340,
+          "reward": 33730,
+          "cumulative": 366056,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 341,
+          "reward": 33788,
+          "cumulative": 399844,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 342,
+          "reward": 38841,
+          "cumulative": 438685,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 343,
+          "reward": 34956,
+          "cumulative": 473641,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 344,
+          "reward": 26975,
+          "cumulative": 500616,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 345,
+          "reward": 40282,
+          "cumulative": 540898,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 346,
+          "reward": 21752,
+          "cumulative": 562650,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 347,
+          "reward": 33549,
+          "cumulative": 596199,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 348,
+          "reward": 27154,
+          "cumulative": 623353,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 349,
+          "reward": 25353,
+          "cumulative": 648706,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 350,
+          "reward": 32791,
+          "cumulative": 681497,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 351,
+          "reward": 24578,
+          "cumulative": 706075,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 352,
+          "reward": 23125,
+          "cumulative": 729200,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 353,
+          "reward": 16326,
+          "cumulative": 745526,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 354,
+          "reward": 26577,
+          "cumulative": 772103,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 355,
+          "reward": 22507,
+          "cumulative": 794610,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 356,
+          "reward": 25128,
+          "cumulative": 819738,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 357,
+          "reward": 27148,
+          "cumulative": 846886,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 358,
+          "reward": 23071,
+          "cumulative": 869957,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 359,
+          "reward": 25098,
+          "cumulative": 895055,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 360,
+          "reward": 29765,
+          "cumulative": 924820,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 361,
+          "reward": 24372,
+          "cumulative": 949192,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 362,
+          "reward": 31029,
+          "cumulative": 980221,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 363,
+          "reward": 24289,
+          "cumulative": 1004510,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 364,
+          "reward": 28582,
+          "cumulative": 1033092,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 365,
+          "reward": 27827,
+          "cumulative": 1060919,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 366,
+          "reward": 24296,
+          "cumulative": 1085215,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 367,
+          "reward": 22939,
+          "cumulative": 1108154,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 368,
+          "reward": 26249,
+          "cumulative": 1134403,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 369,
+          "reward": 22923,
+          "cumulative": 1157326,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 370,
+          "reward": 28284,
+          "cumulative": 1185610,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 371,
+          "reward": 26134,
+          "cumulative": 1211744,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 372,
+          "reward": 31345,
+          "cumulative": 1243089,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 373,
+          "reward": 23946,
+          "cumulative": 1267035,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 374,
+          "reward": 26482,
+          "cumulative": 1293517,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 375,
+          "reward": 28462,
+          "cumulative": 1321979,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 376,
+          "reward": 23835,
+          "cumulative": 1345814,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 377,
+          "reward": 27073,
+          "cumulative": 1372887,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 378,
+          "reward": 26241,
+          "cumulative": 1399128,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 379,
+          "reward": 25499,
+          "cumulative": 1424627,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 380,
+          "reward": 25446,
+          "cumulative": 1450073,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 381,
+          "reward": 20214,
+          "cumulative": 1470287,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 382,
+          "reward": 17533,
+          "cumulative": 1487820,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 384,
+          "reward": 24173,
+          "cumulative": 1511993,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 385,
+          "reward": 23486,
+          "cumulative": 1535479,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 386,
+          "reward": 23797,
+          "cumulative": 1559276,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 387,
+          "reward": 17474,
+          "cumulative": 1576750,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 388,
+          "reward": 21310,
+          "cumulative": 1598060,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 389,
+          "reward": 23237,
+          "cumulative": 1621297,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 390,
+          "reward": 24491,
+          "cumulative": 1645788,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 391,
+          "reward": 20606,
+          "cumulative": 1666394,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 392,
+          "reward": 17315,
+          "cumulative": 1683709,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 393,
+          "reward": 26182,
+          "cumulative": 1709891,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 394,
+          "reward": 22434,
+          "cumulative": 1732325,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 395,
+          "reward": 21586,
+          "cumulative": 1753911,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 396,
+          "reward": 22930,
+          "cumulative": 1776841,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 397,
+          "reward": 33088,
+          "cumulative": 1809929,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 398,
+          "reward": 31184,
+          "cumulative": 1841113,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 399,
+          "reward": 29104,
+          "cumulative": 1870217,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 400,
+          "reward": 25035,
+          "cumulative": 1895252,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 401,
+          "reward": 37467,
+          "cumulative": 1932719,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 402,
+          "reward": 46138,
+          "cumulative": 1978857,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 403,
+          "reward": 38466,
+          "cumulative": 2017323,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 404,
+          "reward": 36202,
+          "cumulative": 2053525,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 405,
+          "reward": 35448,
+          "cumulative": 2088973,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 406,
+          "reward": 41697,
+          "cumulative": 2130670,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 407,
+          "reward": 39579,
+          "cumulative": 2170249,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 408,
+          "reward": 35740,
+          "cumulative": 2205989,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 409,
+          "reward": 41058,
+          "cumulative": 2247047,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 410,
+          "reward": 45866,
+          "cumulative": 2292913,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 411,
+          "reward": 39932,
+          "cumulative": 2332845,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 412,
+          "reward": 36138,
+          "cumulative": 2368983,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 413,
+          "reward": 44135,
+          "cumulative": 2413118,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 414,
+          "reward": 42249,
+          "cumulative": 2455367,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 415,
+          "reward": 31331,
+          "cumulative": 2486698,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 416,
+          "reward": 30863,
+          "cumulative": 2517561,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 417,
+          "reward": 50016,
+          "cumulative": 2567577,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 418,
+          "reward": 35932,
+          "cumulative": 2603509,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 419,
+          "reward": 43560,
+          "cumulative": 2647069,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 420,
+          "reward": 35920,
+          "cumulative": 2682989,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 421,
+          "reward": 40406,
+          "cumulative": 2723395,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 422,
+          "reward": 35169,
+          "cumulative": 2758564,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 423,
+          "reward": 41025,
+          "cumulative": 2799589,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 424,
+          "reward": 40651,
+          "cumulative": 2840240,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 425,
+          "reward": 37952,
+          "cumulative": 2878192,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 426,
+          "reward": 36254,
+          "cumulative": 2914446,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 427,
+          "reward": 26153,
+          "cumulative": 2940599,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 428,
+          "reward": 28398,
+          "cumulative": 2968997,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 429,
+          "reward": 31568,
+          "cumulative": 3000565,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 430,
+          "reward": 25892,
+          "cumulative": 3026457,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 431,
+          "reward": 33167,
+          "cumulative": 3059624,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 432,
+          "reward": 29772,
+          "cumulative": 3089396,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 433,
+          "reward": 35920,
+          "cumulative": 3125316,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 434,
+          "reward": 27590,
+          "cumulative": 3152906,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 435,
+          "reward": 26156,
+          "cumulative": 3179062,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 436,
+          "reward": 29812,
+          "cumulative": 3208874,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 437,
+          "reward": 25894,
+          "cumulative": 3234768,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 438,
+          "reward": 35274,
+          "cumulative": 3270042,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 439,
+          "reward": 27556,
+          "cumulative": 3297598,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 440,
+          "reward": 27629,
+          "cumulative": 3325227,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 441,
+          "reward": 31415,
+          "cumulative": 3356642,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 442,
+          "reward": 28711,
+          "cumulative": 3385353,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 443,
+          "reward": 30873,
+          "cumulative": 3416226,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 444,
+          "reward": 28041,
+          "cumulative": 3444267,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 445,
+          "reward": 27397,
+          "cumulative": 3471664,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 446,
+          "reward": 30533,
+          "cumulative": 3502197,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 447,
+          "reward": 0,
+          "cumulative": 3502197,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 448,
+          "reward": 0,
+          "cumulative": 3502197,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 449,
+          "reward": 15820,
+          "cumulative": 3518017,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 450,
+          "reward": 23925,
+          "cumulative": 3541942,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 451,
+          "reward": 17677,
+          "cumulative": 3559619,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 452,
+          "reward": 12608,
+          "cumulative": 3572227,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 453,
+          "reward": 12085,
+          "cumulative": 3584312,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 456,
+          "reward": 5932,
+          "cumulative": 3590244,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 457,
+          "reward": 17293,
+          "cumulative": 3607537,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 458,
+          "reward": 17232,
+          "cumulative": 3624769,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 459,
+          "reward": 23089,
+          "cumulative": 3647858,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 460,
+          "reward": 13276,
+          "cumulative": 3661134,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 461,
+          "reward": 20568,
+          "cumulative": 3681702,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 462,
+          "reward": 21518,
+          "cumulative": 3703220,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 463,
+          "reward": 16047,
+          "cumulative": 3719267,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 464,
+          "reward": 16527,
+          "cumulative": 3735794,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 465,
+          "reward": 21816,
+          "cumulative": 3757610,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 466,
+          "reward": 19325,
+          "cumulative": 3776935,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 467,
+          "reward": 20802,
+          "cumulative": 3797737,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 468,
+          "reward": 18342,
+          "cumulative": 3816079,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 469,
+          "reward": 15836,
+          "cumulative": 3831915,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 470,
+          "reward": 10551,
+          "cumulative": 3842466,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 471,
+          "reward": 13877,
+          "cumulative": 3856343,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 472,
+          "reward": 18550,
+          "cumulative": 3874893,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 473,
+          "reward": 19905,
+          "cumulative": 3894798,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 474,
+          "reward": 20779,
+          "cumulative": 3915577,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 475,
+          "reward": 18857,
+          "cumulative": 3934434,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 476,
+          "reward": 20222,
+          "cumulative": 3954656,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 477,
+          "reward": 13118,
+          "cumulative": 3967774,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 478,
+          "reward": 21518,
+          "cumulative": 3989292,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 479,
+          "reward": 19189,
+          "cumulative": 4008481,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 480,
+          "reward": 21005,
+          "cumulative": 4029486,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 481,
+          "reward": 17685,
+          "cumulative": 4047171,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 482,
+          "reward": 16717,
+          "cumulative": 4063888,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 483,
+          "reward": 16688,
+          "cumulative": 4080576,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 484,
+          "reward": 16206,
+          "cumulative": 4096782,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 485,
+          "reward": 18032,
+          "cumulative": 4114814,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 486,
+          "reward": 13854,
+          "cumulative": 4128668,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 487,
+          "reward": 17040,
+          "cumulative": 4145708,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 488,
+          "reward": 17434,
+          "cumulative": 4163142,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 489,
+          "reward": 16045,
+          "cumulative": 4179187,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 490,
+          "reward": 16970,
+          "cumulative": 4196157,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 491,
+          "reward": 16024,
+          "cumulative": 4212181,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 492,
+          "reward": 17342,
+          "cumulative": 4229523,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 493,
+          "reward": 15951,
+          "cumulative": 4245474,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 494,
+          "reward": 19482,
+          "cumulative": 4264956,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 495,
+          "reward": 12628,
+          "cumulative": 4277584,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 496,
+          "reward": 14854,
+          "cumulative": 4292438,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 497,
+          "reward": 16180,
+          "cumulative": 4308618,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 498,
+          "reward": 25454,
+          "cumulative": 4334072,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 499,
+          "reward": 17089,
+          "cumulative": 4351161,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 500,
+          "reward": 15689,
+          "cumulative": 4366850,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 501,
+          "reward": 17841,
+          "cumulative": 4384691,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 502,
+          "reward": 20075,
+          "cumulative": 4404766,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 503,
+          "reward": 15513,
+          "cumulative": 4420279,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 504,
+          "reward": 17722,
+          "cumulative": 4438001,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 505,
+          "reward": 14489,
+          "cumulative": 4452490,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 506,
+          "reward": 14029,
+          "cumulative": 4466519,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 507,
+          "reward": 15750,
+          "cumulative": 4482269,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 508,
+          "reward": 15725,
+          "cumulative": 4497994,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 509,
+          "reward": 16126,
+          "cumulative": 4514120,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 510,
+          "reward": 20911,
+          "cumulative": 4535031,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 511,
+          "reward": 17847,
+          "cumulative": 4552878,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 512,
+          "reward": 15647,
+          "cumulative": 4568525,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 513,
+          "reward": 16928,
+          "cumulative": 4585453,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 514,
+          "reward": 13003,
+          "cumulative": 4598456,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 515,
+          "reward": 21452,
+          "cumulative": 4619908,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 516,
+          "reward": 19236,
+          "cumulative": 4639144,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 517,
+          "reward": 17977,
+          "cumulative": 4657121,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 518,
+          "reward": 13191,
+          "cumulative": 4670312,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 519,
+          "reward": 18261,
+          "cumulative": 4688573,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 520,
+          "reward": 19173,
+          "cumulative": 4707746,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 521,
+          "reward": 12703,
+          "cumulative": 4720449,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 522,
+          "reward": 12517,
+          "cumulative": 4732966,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 523,
+          "reward": 12026,
+          "cumulative": 4744992,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 524,
+          "reward": 13138,
+          "cumulative": 4758130,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 525,
+          "reward": 16256,
+          "cumulative": 4774386,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 526,
+          "reward": 11358,
+          "cumulative": 4785744,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 527,
+          "reward": 13309,
+          "cumulative": 4799053,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 528,
+          "reward": 23678,
+          "cumulative": 4822731,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 529,
+          "reward": 14379,
+          "cumulative": 4837110,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 530,
+          "reward": 11154,
+          "cumulative": 4848264,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 531,
+          "reward": 14787,
+          "cumulative": 4863051,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 532,
+          "reward": 11551,
+          "cumulative": 4874602,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 533,
+          "reward": 14296,
+          "cumulative": 4888898,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 534,
+          "reward": 15093,
+          "cumulative": 4903991,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 535,
+          "reward": 11110,
+          "cumulative": 4915101,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 536,
+          "reward": 16275,
+          "cumulative": 4931376,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 537,
+          "reward": 20703,
+          "cumulative": 4952079,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 538,
+          "reward": 21822,
+          "cumulative": 4973901,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 539,
+          "reward": 24981,
+          "cumulative": 4998882,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 540,
+          "reward": 22629,
+          "cumulative": 5021511,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 541,
+          "reward": 19366,
+          "cumulative": 5040877,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 542,
+          "reward": 16911,
+          "cumulative": 5057788,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 543,
+          "reward": 18448,
+          "cumulative": 5076236,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 544,
+          "reward": 20778,
+          "cumulative": 5097014,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 545,
+          "reward": 17832,
+          "cumulative": 5114846,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 546,
+          "reward": 22092,
+          "cumulative": 5136938,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 547,
+          "reward": 24526,
+          "cumulative": 5161464,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 548,
+          "reward": 21038,
+          "cumulative": 5182502,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 549,
+          "reward": 21864,
+          "cumulative": 5204366,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 550,
+          "reward": 20690,
+          "cumulative": 5225056,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 551,
+          "reward": 18264,
+          "cumulative": 5243320,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 552,
+          "reward": 18213,
+          "cumulative": 5261533,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 553,
+          "reward": 16949,
+          "cumulative": 5278482,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 554,
+          "reward": 24857,
+          "cumulative": 5303339,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 555,
+          "reward": 22291,
+          "cumulative": 5325630,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 556,
+          "reward": 19080,
+          "cumulative": 5344710,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 557,
+          "reward": 21856,
+          "cumulative": 5366566,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 558,
+          "reward": 23356,
+          "cumulative": 5389922,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 559,
+          "reward": 19098,
+          "cumulative": 5409020,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 560,
+          "reward": 20215,
+          "cumulative": 5429235,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 561,
+          "reward": 21363,
+          "cumulative": 5450598,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 562,
+          "reward": 23572,
+          "cumulative": 5474170,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 563,
+          "reward": 16509,
+          "cumulative": 5490679,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 564,
+          "reward": 18740,
+          "cumulative": 5509419,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 565,
+          "reward": 17597,
+          "cumulative": 5527016,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 566,
+          "reward": 19019,
+          "cumulative": 5546035,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 567,
+          "reward": 18261,
+          "cumulative": 5564296,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 568,
+          "reward": 17903,
+          "cumulative": 5582199,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 569,
+          "reward": 15234,
+          "cumulative": 5597433,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 570,
+          "reward": 14864,
+          "cumulative": 5612297,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 571,
+          "reward": 21623,
+          "cumulative": 5633920,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 572,
+          "reward": 18027,
+          "cumulative": 5651947,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 573,
+          "reward": 17634,
+          "cumulative": 5669581,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 574,
+          "reward": 16858,
+          "cumulative": 5686439,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 575,
+          "reward": 17961,
+          "cumulative": 5704400,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 576,
+          "reward": 17897,
+          "cumulative": 5722297,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 577,
+          "reward": 16356,
+          "cumulative": 5738653,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 578,
+          "reward": 11829,
+          "cumulative": 5750482,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 579,
+          "reward": 16642,
+          "cumulative": 5767124,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 580,
+          "reward": 19537,
+          "cumulative": 5786661,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 581,
+          "reward": 19083,
+          "cumulative": 5805744,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 582,
+          "reward": 18354,
+          "cumulative": 5824098,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 583,
+          "reward": 13471,
+          "cumulative": 5837569,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 584,
+          "reward": 9789,
+          "cumulative": 5847358,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 585,
+          "reward": 14468,
+          "cumulative": 5861826,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 586,
+          "reward": 16227,
+          "cumulative": 5878053,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 587,
+          "reward": 12241,
+          "cumulative": 5890294,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 588,
+          "reward": 12908,
+          "cumulative": 5903202,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 589,
+          "reward": 13258,
+          "cumulative": 5916460,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 590,
+          "reward": 13222,
+          "cumulative": 5929682,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 591,
+          "reward": 17035,
+          "cumulative": 5946717,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 592,
+          "reward": 13826,
+          "cumulative": 5960543,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 593,
+          "reward": 16699,
+          "cumulative": 5977242,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 594,
+          "reward": 10232,
+          "cumulative": 5987474,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 595,
+          "reward": 16198,
+          "cumulative": 6003672,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 596,
+          "reward": 11250,
+          "cumulative": 6014922,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 597,
+          "reward": 12084,
+          "cumulative": 6027006,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 598,
+          "reward": 10654,
+          "cumulative": 6037660,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 599,
+          "reward": 14511,
+          "cumulative": 6052171,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 600,
+          "reward": 13060,
+          "cumulative": 6065231,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 601,
+          "reward": 15709,
+          "cumulative": 6080940,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 602,
+          "reward": 11310,
+          "cumulative": 6092250,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 603,
+          "reward": 13019,
+          "cumulative": 6105269,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 604,
+          "reward": 14306,
+          "cumulative": 6119575,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 605,
+          "reward": 11239,
+          "cumulative": 6130814,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 606,
+          "reward": 15871,
+          "cumulative": 6146685,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 607,
+          "reward": 13214,
+          "cumulative": 6159899,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 608,
+          "reward": 14899,
+          "cumulative": 6174798,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 609,
+          "reward": 11872,
+          "cumulative": 6186670,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 610,
+          "reward": 12225,
+          "cumulative": 6198895,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 611,
+          "reward": 14882,
+          "cumulative": 6213777,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 612,
+          "reward": 12030,
+          "cumulative": 6225807,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 613,
+          "reward": 13032,
+          "cumulative": 6238839,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 614,
+          "reward": 13093,
+          "cumulative": 6251932,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        },
+        {
+          "epoch": 615,
+          "reward": 14756,
+          "cumulative": 6266688,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        }
+      ],
+      "poolHistory": [
+        {
+          "epoch": 331,
+          "poolId": "pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk"
+        }
+      ],
+      "links": {
+        "stakeKey": "https://cardanoscan.io/stakekey/stake1u9f9v0z5zzlldgx58n8tklphu8mf7h4jvp2j2gddluemnssjfnkzz",
+        "pool": "https://cardanoscan.io/pool/pool1ases3nklh6gyjf74r7dqm89exjfd520z9cefqru959wcccmrdlk",
+        "drep": null
+      },
+      "discoverySource": "direct"
+    },
+    {
+      "stakeAddress": "stake179penqfa4kgmk799avtuyml4ppftcawnlfakaxhgwgevesggrke2g",
+      "account": {
+        "stakeAddress": "stake179penqfa4kgmk799avtuyml4ppftcawnlfakaxhgwgevesggrke2g",
+        "active": true,
+        "activeEpoch": 483,
+        "controlledAda": 2200383,
+        "rewardsSumAda": 259380,
+        "withdrawalsSumAda": 258858,
+        "reservesSumAda": 0,
+        "treasurySumAda": 0,
+        "withdrawableAda": 521,
+        "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3",
+        "drepId": null
+      },
+      "isGenesis": false,
+      "byronAddressCount": 0,
+      "shelleyAddressCount": 3,
+      "totalAddresses": 3,
+      "sampleAddresses": {
+        "byron": [],
+        "shelley": [
+          "addr1x8srqftqemf0mjlukfszd97ljuxdp44r372txfcr75wrz26rnxqnmtv3hdu2t6chcfhl2zzjh36a87nmd6dwsu3jenqsslnz7e",
+          "addr1x8ax5k9mutg07p2ngscu3chsauktmstq92z9de938j8nqa6rnxqnmtv3hdu2t6chcfhl2zzjh36a87nmd6dwsu3jenqs2felck",
+          "addr1x9x70xsvzuvqqv9l7npksfwtd6vu4gq8h33j77y4vx3x64jrnxqnmtv3hdu2t6chcfhl2zzjh36a87nmd6dwsu3jenqskqe4x0"
+        ]
+      },
+      "governance": null,
+      "rewardSummary": {
+        "totalEpochs": 130,
+        "firstEpoch": 486,
+        "lastEpoch": 616,
+        "totalRewardsAda": 259380,
+        "avgRewardPerEpoch": 1995,
+        "peakEpochReward": 10276
+      },
+      "rewardHistory": [
+        {
+          "epoch": 486,
+          "reward": 2371,
+          "cumulative": 2371,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 487,
+          "reward": 2428,
+          "cumulative": 4799,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 488,
+          "reward": 1358,
+          "cumulative": 6157,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 489,
+          "reward": 2864,
+          "cumulative": 9021,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 490,
+          "reward": 2122,
+          "cumulative": 11143,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 491,
+          "reward": 3278,
+          "cumulative": 14421,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 492,
+          "reward": 3739,
+          "cumulative": 18160,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 493,
+          "reward": 4913,
+          "cumulative": 23073,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 494,
+          "reward": 4909,
+          "cumulative": 27982,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 495,
+          "reward": 5288,
+          "cumulative": 33270,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 496,
+          "reward": 3744,
+          "cumulative": 37014,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 497,
+          "reward": 4138,
+          "cumulative": 41152,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 498,
+          "reward": 5318,
+          "cumulative": 46470,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 499,
+          "reward": 5324,
+          "cumulative": 51794,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 500,
+          "reward": 3356,
+          "cumulative": 55150,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 501,
+          "reward": 5733,
+          "cumulative": 60883,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 502,
+          "reward": 5335,
+          "cumulative": 66218,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 503,
+          "reward": 9623,
+          "cumulative": 75841,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 504,
+          "reward": 5709,
+          "cumulative": 81550,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 505,
+          "reward": 9154,
+          "cumulative": 90704,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 506,
+          "reward": 7181,
+          "cumulative": 97885,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 507,
+          "reward": 6403,
+          "cumulative": 104288,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 508,
+          "reward": 5619,
+          "cumulative": 109907,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 509,
+          "reward": 7535,
+          "cumulative": 117442,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 510,
+          "reward": 10276,
+          "cumulative": 127718,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 511,
+          "reward": 7283,
+          "cumulative": 135001,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 512,
+          "reward": 3180,
+          "cumulative": 138181,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 513,
+          "reward": 4280,
+          "cumulative": 142461,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 514,
+          "reward": 9820,
+          "cumulative": 152281,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 515,
+          "reward": 6808,
+          "cumulative": 159089,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 516,
+          "reward": 4936,
+          "cumulative": 164025,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 517,
+          "reward": 4909,
+          "cumulative": 168934,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 518,
+          "reward": 4520,
+          "cumulative": 173454,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 519,
+          "reward": 5954,
+          "cumulative": 179408,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 520,
+          "reward": 4413,
+          "cumulative": 183821,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 521,
+          "reward": 2659,
+          "cumulative": 186480,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 522,
+          "reward": 3291,
+          "cumulative": 189771,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 523,
+          "reward": 4325,
+          "cumulative": 194096,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 524,
+          "reward": 3253,
+          "cumulative": 197349,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 525,
+          "reward": 2880,
+          "cumulative": 200229,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 526,
+          "reward": 3872,
+          "cumulative": 204101,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 527,
+          "reward": 3506,
+          "cumulative": 207607,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 528,
+          "reward": 5147,
+          "cumulative": 212754,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 529,
+          "reward": 4442,
+          "cumulative": 217196,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 530,
+          "reward": 4749,
+          "cumulative": 221945,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 531,
+          "reward": 2794,
+          "cumulative": 224739,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 532,
+          "reward": 3100,
+          "cumulative": 227839,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 533,
+          "reward": 3746,
+          "cumulative": 231585,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 534,
+          "reward": 3440,
+          "cumulative": 235025,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 535,
+          "reward": 3418,
+          "cumulative": 238443,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 536,
+          "reward": 2109,
+          "cumulative": 240552,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 537,
+          "reward": 3390,
+          "cumulative": 243942,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 538,
+          "reward": 2094,
+          "cumulative": 246036,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 539,
+          "reward": 41,
+          "cumulative": 246077,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 540,
+          "reward": 49,
+          "cumulative": 246126,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 541,
+          "reward": 41,
+          "cumulative": 246167,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 542,
+          "reward": 29,
+          "cumulative": 246196,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 543,
+          "reward": 71,
+          "cumulative": 246267,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 544,
+          "reward": 158,
+          "cumulative": 246425,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 545,
+          "reward": 176,
+          "cumulative": 246601,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 546,
+          "reward": 148,
+          "cumulative": 246749,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 547,
+          "reward": 68,
+          "cumulative": 246817,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 548,
+          "reward": 117,
+          "cumulative": 246934,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 549,
+          "reward": 173,
+          "cumulative": 247107,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 550,
+          "reward": 78,
+          "cumulative": 247185,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 551,
+          "reward": 117,
+          "cumulative": 247302,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 552,
+          "reward": 180,
+          "cumulative": 247482,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 553,
+          "reward": 235,
+          "cumulative": 247717,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 554,
+          "reward": 48,
+          "cumulative": 247765,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 555,
+          "reward": 66,
+          "cumulative": 247831,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 556,
+          "reward": 57,
+          "cumulative": 247888,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 557,
+          "reward": 57,
+          "cumulative": 247945,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 558,
+          "reward": 54,
+          "cumulative": 247999,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 559,
+          "reward": 98,
+          "cumulative": 248097,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 560,
+          "reward": 53,
+          "cumulative": 248150,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 561,
+          "reward": 48,
+          "cumulative": 248198,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 562,
+          "reward": 53,
+          "cumulative": 248251,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 563,
+          "reward": 46,
+          "cumulative": 248297,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 564,
+          "reward": 53,
+          "cumulative": 248350,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 565,
+          "reward": 49,
+          "cumulative": 248399,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 566,
+          "reward": 63,
+          "cumulative": 248462,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 567,
+          "reward": 24,
+          "cumulative": 248486,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 568,
+          "reward": 41,
+          "cumulative": 248527,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 569,
+          "reward": 80,
+          "cumulative": 248607,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 570,
+          "reward": 62,
+          "cumulative": 248669,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 571,
+          "reward": 135,
+          "cumulative": 248804,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 572,
+          "reward": 46,
+          "cumulative": 248850,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 573,
+          "reward": 57,
+          "cumulative": 248907,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 575,
+          "reward": 65,
+          "cumulative": 248972,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 576,
+          "reward": 87,
+          "cumulative": 249059,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 577,
+          "reward": 26,
+          "cumulative": 249085,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 578,
+          "reward": 84,
+          "cumulative": 249169,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 579,
+          "reward": 61,
+          "cumulative": 249230,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 580,
+          "reward": 56,
+          "cumulative": 249286,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 581,
+          "reward": 24,
+          "cumulative": 249310,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 582,
+          "reward": 145,
+          "cumulative": 249455,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 583,
+          "reward": 38,
+          "cumulative": 249493,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 584,
+          "reward": 70,
+          "cumulative": 249563,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 585,
+          "reward": 93,
+          "cumulative": 249656,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 586,
+          "reward": 75,
+          "cumulative": 249731,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 587,
+          "reward": 55,
+          "cumulative": 249786,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 588,
+          "reward": 68,
+          "cumulative": 249854,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 589,
+          "reward": 101,
+          "cumulative": 249955,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 590,
+          "reward": 70,
+          "cumulative": 250025,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 591,
+          "reward": 27,
+          "cumulative": 250052,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 592,
+          "reward": 38,
+          "cumulative": 250090,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 593,
+          "reward": 60,
+          "cumulative": 250150,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 594,
+          "reward": 22,
+          "cumulative": 250172,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 595,
+          "reward": 55,
+          "cumulative": 250227,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 596,
+          "reward": 45,
+          "cumulative": 250272,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 597,
+          "reward": 35,
+          "cumulative": 250307,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 598,
+          "reward": 27,
+          "cumulative": 250334,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 599,
+          "reward": 62,
+          "cumulative": 250396,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 600,
+          "reward": 54,
+          "cumulative": 250450,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 601,
+          "reward": 313,
+          "cumulative": 250763,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 602,
+          "reward": 589,
+          "cumulative": 251352,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 603,
+          "reward": 346,
+          "cumulative": 251698,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 604,
+          "reward": 278,
+          "cumulative": 251976,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 605,
+          "reward": 903,
+          "cumulative": 252879,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 606,
+          "reward": 1086,
+          "cumulative": 253965,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 607,
+          "reward": 974,
+          "cumulative": 254939,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 608,
+          "reward": 320,
+          "cumulative": 255259,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 609,
+          "reward": 621,
+          "cumulative": 255880,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 610,
+          "reward": 472,
+          "cumulative": 256352,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 611,
+          "reward": 394,
+          "cumulative": 256746,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 612,
+          "reward": 635,
+          "cumulative": 257381,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 613,
+          "reward": 729,
+          "cumulative": 258110,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 614,
+          "reward": 683,
+          "cumulative": 258793,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 615,
+          "reward": 521,
+          "cumulative": 259314,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 616,
+          "reward": 526,
+          "cumulative": 259840,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        }
+      ],
+      "poolHistory": [
+        {
+          "epoch": 486,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        }
+      ],
+      "links": {
+        "stakeKey": "https://cardanoscan.io/stakekey/stake179penqfa4kgmk799avtuyml4ppftcawnlfakaxhgwgevesggrke2g",
+        "pool": "https://cardanoscan.io/pool/pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3",
+        "drep": null
+      },
+      "discoverySource": "direct"
+    },
+    {
+      "stakeAddress": "stake1ux7ppl339txknchp9j7zejs94g8yxt3aaejat22fsdzwf2ssw6paf",
+      "account": {
+        "stakeAddress": "stake1ux7ppl339txknchp9j7zejs94g8yxt3aaejat22fsdzwf2ssw6paf",
+        "active": true,
+        "activeEpoch": 536,
+        "controlledAda": 4571673,
+        "rewardsSumAda": 142523,
+        "withdrawalsSumAda": 141305,
+        "reservesSumAda": 0,
+        "treasurySumAda": 0,
+        "withdrawableAda": 1217,
+        "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3",
+        "drepId": "drep_always_abstain"
+      },
+      "isGenesis": false,
+      "byronAddressCount": 0,
+      "shelleyAddressCount": 1,
+      "totalAddresses": 1,
+      "sampleAddresses": {
+        "byron": [],
+        "shelley": [
+          "addr1z8srqftqemf0mjlukfszd97ljuxdp44r372txfcr75wrz2auzrlrz2kdd83wzt9u9n9qt2swgvhrmmn96k55nq6yuj4qw992w9"
+        ]
+      },
+      "governance": {
+        "drepId": "drep_always_abstain"
+      },
+      "rewardSummary": {
+        "totalEpochs": 77,
+        "firstEpoch": 539,
+        "lastEpoch": 616,
+        "totalRewardsAda": 142523,
+        "avgRewardPerEpoch": 1851,
+        "peakEpochReward": 3998
+      },
+      "rewardHistory": [
+        {
+          "epoch": 539,
+          "reward": 2043,
+          "cumulative": 2043,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 540,
+          "reward": 2362,
+          "cumulative": 4405,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 541,
+          "reward": 2034,
+          "cumulative": 6439,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 542,
+          "reward": 1412,
+          "cumulative": 7851,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 543,
+          "reward": 3265,
+          "cumulative": 11116,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 544,
+          "reward": 2864,
+          "cumulative": 13980,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 545,
+          "reward": 3426,
+          "cumulative": 17406,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 546,
+          "reward": 2811,
+          "cumulative": 20217,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 547,
+          "reward": 1335,
+          "cumulative": 21552,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 548,
+          "reward": 2221,
+          "cumulative": 23773,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 549,
+          "reward": 3086,
+          "cumulative": 26859,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 550,
+          "reward": 1321,
+          "cumulative": 28180,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 551,
+          "reward": 1893,
+          "cumulative": 30073,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 552,
+          "reward": 2743,
+          "cumulative": 32816,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 553,
+          "reward": 3598,
+          "cumulative": 36414,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 554,
+          "reward": 2246,
+          "cumulative": 38660,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 555,
+          "reward": 2861,
+          "cumulative": 41521,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 556,
+          "reward": 2547,
+          "cumulative": 44068,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 557,
+          "reward": 2236,
+          "cumulative": 46304,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 558,
+          "reward": 2233,
+          "cumulative": 48537,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 559,
+          "reward": 3998,
+          "cumulative": 52535,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 560,
+          "reward": 2223,
+          "cumulative": 54758,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 561,
+          "reward": 1922,
+          "cumulative": 56680,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 562,
+          "reward": 2211,
+          "cumulative": 58891,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 563,
+          "reward": 1901,
+          "cumulative": 60792,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 564,
+          "reward": 2183,
+          "cumulative": 62975,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 565,
+          "reward": 1888,
+          "cumulative": 64863,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 566,
+          "reward": 2449,
+          "cumulative": 67312,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 567,
+          "reward": 1011,
+          "cumulative": 68323,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 568,
+          "reward": 1290,
+          "cumulative": 69613,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 569,
+          "reward": 1845,
+          "cumulative": 71458,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 570,
+          "reward": 1851,
+          "cumulative": 73309,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 571,
+          "reward": 3819,
+          "cumulative": 77128,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 572,
+          "reward": 1270,
+          "cumulative": 78398,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 573,
+          "reward": 1542,
+          "cumulative": 79940,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 575,
+          "reward": 1824,
+          "cumulative": 81764,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 576,
+          "reward": 2376,
+          "cumulative": 84140,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 577,
+          "reward": 693,
+          "cumulative": 84833,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 578,
+          "reward": 2057,
+          "cumulative": 86890,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 579,
+          "reward": 1511,
+          "cumulative": 88401,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 580,
+          "reward": 1517,
+          "cumulative": 89918,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 581,
+          "reward": 691,
+          "cumulative": 90609,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 582,
+          "reward": 3712,
+          "cumulative": 94321,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 583,
+          "reward": 952,
+          "cumulative": 95273,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 584,
+          "reward": 1765,
+          "cumulative": 97038,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 585,
+          "reward": 2021,
+          "cumulative": 99059,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 586,
+          "reward": 1736,
+          "cumulative": 100795,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 587,
+          "reward": 1193,
+          "cumulative": 101988,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 588,
+          "reward": 1456,
+          "cumulative": 103444,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 589,
+          "reward": 2538,
+          "cumulative": 105982,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 590,
+          "reward": 1715,
+          "cumulative": 107697,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 591,
+          "reward": 655,
+          "cumulative": 108352,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 592,
+          "reward": 913,
+          "cumulative": 109265,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 593,
+          "reward": 1438,
+          "cumulative": 110703,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 594,
+          "reward": 647,
+          "cumulative": 111350,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 595,
+          "reward": 1691,
+          "cumulative": 113041,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 596,
+          "reward": 1432,
+          "cumulative": 114473,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 597,
+          "reward": 1149,
+          "cumulative": 115622,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 598,
+          "reward": 886,
+          "cumulative": 116508,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 599,
+          "reward": 1916,
+          "cumulative": 118424,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 600,
+          "reward": 1648,
+          "cumulative": 120072,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 601,
+          "reward": 900,
+          "cumulative": 120972,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 602,
+          "reward": 1726,
+          "cumulative": 122698,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 603,
+          "reward": 876,
+          "cumulative": 123574,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 604,
+          "reward": 665,
+          "cumulative": 124239,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 605,
+          "reward": 1951,
+          "cumulative": 126190,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 606,
+          "reward": 2534,
+          "cumulative": 128724,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 607,
+          "reward": 2642,
+          "cumulative": 131366,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 608,
+          "reward": 877,
+          "cumulative": 132243,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 609,
+          "reward": 1653,
+          "cumulative": 133896,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 610,
+          "reward": 1274,
+          "cumulative": 135170,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 611,
+          "reward": 1079,
+          "cumulative": 136249,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 612,
+          "reward": 1623,
+          "cumulative": 137872,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 613,
+          "reward": 1799,
+          "cumulative": 139671,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 614,
+          "reward": 1597,
+          "cumulative": 141268,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 615,
+          "reward": 1217,
+          "cumulative": 142485,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        },
+        {
+          "epoch": 616,
+          "reward": 1215,
+          "cumulative": 143700,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        }
+      ],
+      "poolHistory": [
+        {
+          "epoch": 539,
+          "poolId": "pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3"
+        }
+      ],
+      "links": {
+        "stakeKey": "https://cardanoscan.io/stakekey/stake1ux7ppl339txknchp9j7zejs94g8yxt3aaejat22fsdzwf2ssw6paf",
+        "pool": "https://cardanoscan.io/pool/pool1ea34czsr90yc63fmv4gj4tetp7ds7c4jhpj6vqg4yw40wvygdl3",
+        "drep": null
+      },
+      "discoverySource": "direct"
+    },
+    {
+      "stakeAddress": "stake1uy22xxwr0436nhxrmr626yp4y4xyqnvqy5kzvrtr3ls9d6gc3y95z",
+      "account": {
+        "stakeAddress": "stake1uy22xxwr0436nhxrmr626yp4y4xyqnvqy5kzvrtr3ls9d6gc3y95z",
+        "active": true,
+        "activeEpoch": 493,
+        "controlledAda": 771921,
+        "rewardsSumAda": 11486,
+        "withdrawalsSumAda": 11486,
+        "reservesSumAda": 0,
+        "treasurySumAda": 0,
+        "withdrawableAda": 0,
+        "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm",
+        "drepId": "drep_always_abstain"
+      },
+      "isGenesis": false,
+      "byronAddressCount": 0,
+      "shelleyAddressCount": 1,
+      "totalAddresses": 1,
+      "sampleAddresses": {
+        "byron": [],
+        "shelley": [
+          "addr1q9l34p8gkdx2ywzka0ga3avmnufpyey6av30yd70k3xejns55vvuxltr48wv8k8545gr2f2vgpxcqffvycxk8rlq2m5s2cfqp6"
+        ]
+      },
+      "governance": {
+        "drepId": "drep_always_abstain"
+      },
+      "rewardSummary": {
+        "totalEpochs": 120,
+        "firstEpoch": 495,
+        "lastEpoch": 616,
+        "totalRewardsAda": 11486,
+        "avgRewardPerEpoch": 96,
+        "peakEpochReward": 311
+      },
+      "rewardHistory": [
+        {
+          "epoch": 495,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 496,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 497,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 498,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 499,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 500,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 501,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 502,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 503,
+          "reward": 0,
+          "cumulative": 0,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 504,
+          "reward": 6,
+          "cumulative": 6,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 505,
+          "reward": 4,
+          "cumulative": 10,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 506,
+          "reward": 13,
+          "cumulative": 23,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 507,
+          "reward": 12,
+          "cumulative": 35,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 508,
+          "reward": 15,
+          "cumulative": 50,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 509,
+          "reward": 10,
+          "cumulative": 60,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 510,
+          "reward": 0,
+          "cumulative": 60,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 511,
+          "reward": 10,
+          "cumulative": 70,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 512,
+          "reward": 12,
+          "cumulative": 82,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 513,
+          "reward": 8,
+          "cumulative": 90,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 514,
+          "reward": 5,
+          "cumulative": 95,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 515,
+          "reward": 10,
+          "cumulative": 105,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 516,
+          "reward": 11,
+          "cumulative": 116,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 517,
+          "reward": 17,
+          "cumulative": 133,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 518,
+          "reward": 16,
+          "cumulative": 149,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 519,
+          "reward": 9,
+          "cumulative": 158,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 520,
+          "reward": 12,
+          "cumulative": 170,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 521,
+          "reward": 13,
+          "cumulative": 183,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 522,
+          "reward": 19,
+          "cumulative": 202,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 523,
+          "reward": 11,
+          "cumulative": 213,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 524,
+          "reward": 8,
+          "cumulative": 221,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 525,
+          "reward": 11,
+          "cumulative": 232,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 526,
+          "reward": 19,
+          "cumulative": 251,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 527,
+          "reward": 17,
+          "cumulative": 268,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 528,
+          "reward": 20,
+          "cumulative": 288,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 529,
+          "reward": 14,
+          "cumulative": 302,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 530,
+          "reward": 26,
+          "cumulative": 328,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 531,
+          "reward": 26,
+          "cumulative": 354,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 532,
+          "reward": 51,
+          "cumulative": 405,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 533,
+          "reward": 35,
+          "cumulative": 440,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 534,
+          "reward": 33,
+          "cumulative": 473,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 535,
+          "reward": 18,
+          "cumulative": 491,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 536,
+          "reward": 31,
+          "cumulative": 522,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 537,
+          "reward": 66,
+          "cumulative": 588,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 538,
+          "reward": 72,
+          "cumulative": 660,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 539,
+          "reward": 69,
+          "cumulative": 729,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 540,
+          "reward": 75,
+          "cumulative": 804,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 541,
+          "reward": 100,
+          "cumulative": 904,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 542,
+          "reward": 79,
+          "cumulative": 983,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 543,
+          "reward": 96,
+          "cumulative": 1079,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 544,
+          "reward": 80,
+          "cumulative": 1159,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 545,
+          "reward": 65,
+          "cumulative": 1224,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 546,
+          "reward": 88,
+          "cumulative": 1312,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 547,
+          "reward": 102,
+          "cumulative": 1414,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 548,
+          "reward": 137,
+          "cumulative": 1551,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 549,
+          "reward": 85,
+          "cumulative": 1636,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 550,
+          "reward": 125,
+          "cumulative": 1761,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 551,
+          "reward": 105,
+          "cumulative": 1866,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 552,
+          "reward": 90,
+          "cumulative": 1956,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 553,
+          "reward": 82,
+          "cumulative": 2038,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 554,
+          "reward": 130,
+          "cumulative": 2168,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 555,
+          "reward": 145,
+          "cumulative": 2313,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 556,
+          "reward": 124,
+          "cumulative": 2437,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 557,
+          "reward": 117,
+          "cumulative": 2554,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 558,
+          "reward": 173,
+          "cumulative": 2727,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 559,
+          "reward": 124,
+          "cumulative": 2851,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 560,
+          "reward": 121,
+          "cumulative": 2972,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 561,
+          "reward": 121,
+          "cumulative": 3093,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 562,
+          "reward": 148,
+          "cumulative": 3241,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 563,
+          "reward": 130,
+          "cumulative": 3371,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 564,
+          "reward": 181,
+          "cumulative": 3552,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 565,
+          "reward": 84,
+          "cumulative": 3636,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 566,
+          "reward": 135,
+          "cumulative": 3771,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 567,
+          "reward": 133,
+          "cumulative": 3904,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 568,
+          "reward": 129,
+          "cumulative": 4033,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 569,
+          "reward": 132,
+          "cumulative": 4165,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 570,
+          "reward": 133,
+          "cumulative": 4298,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 571,
+          "reward": 114,
+          "cumulative": 4412,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 572,
+          "reward": 116,
+          "cumulative": 4528,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 573,
+          "reward": 140,
+          "cumulative": 4668,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 574,
+          "reward": 129,
+          "cumulative": 4797,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 575,
+          "reward": 118,
+          "cumulative": 4915,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 576,
+          "reward": 119,
+          "cumulative": 5034,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 577,
+          "reward": 156,
+          "cumulative": 5190,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 578,
+          "reward": 135,
+          "cumulative": 5325,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 579,
+          "reward": 104,
+          "cumulative": 5429,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 580,
+          "reward": 103,
+          "cumulative": 5532,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 581,
+          "reward": 112,
+          "cumulative": 5644,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 582,
+          "reward": 112,
+          "cumulative": 5756,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 583,
+          "reward": 112,
+          "cumulative": 5868,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 584,
+          "reward": 119,
+          "cumulative": 5987,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 585,
+          "reward": 102,
+          "cumulative": 6089,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 586,
+          "reward": 152,
+          "cumulative": 6241,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 587,
+          "reward": 146,
+          "cumulative": 6387,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 588,
+          "reward": 148,
+          "cumulative": 6535,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 589,
+          "reward": 129,
+          "cumulative": 6664,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 590,
+          "reward": 136,
+          "cumulative": 6800,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 591,
+          "reward": 105,
+          "cumulative": 6905,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 592,
+          "reward": 127,
+          "cumulative": 7032,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 593,
+          "reward": 127,
+          "cumulative": 7159,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 594,
+          "reward": 120,
+          "cumulative": 7279,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 595,
+          "reward": 119,
+          "cumulative": 7398,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 596,
+          "reward": 136,
+          "cumulative": 7534,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 597,
+          "reward": 164,
+          "cumulative": 7698,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 598,
+          "reward": 170,
+          "cumulative": 7868,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 599,
+          "reward": 121,
+          "cumulative": 7989,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 601,
+          "reward": 77,
+          "cumulative": 8066,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 602,
+          "reward": 257,
+          "cumulative": 8323,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 604,
+          "reward": 267,
+          "cumulative": 8590,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 605,
+          "reward": 246,
+          "cumulative": 8836,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 606,
+          "reward": 224,
+          "cumulative": 9060,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 607,
+          "reward": 272,
+          "cumulative": 9332,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 608,
+          "reward": 269,
+          "cumulative": 9601,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 609,
+          "reward": 311,
+          "cumulative": 9912,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 610,
+          "reward": 244,
+          "cumulative": 10156,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 611,
+          "reward": 267,
+          "cumulative": 10423,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 612,
+          "reward": 208,
+          "cumulative": 10631,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 613,
+          "reward": 215,
+          "cumulative": 10846,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 614,
+          "reward": 296,
+          "cumulative": 11142,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 615,
+          "reward": 284,
+          "cumulative": 11426,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        },
+        {
+          "epoch": 616,
+          "reward": 303,
+          "cumulative": 11729,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        }
+      ],
+      "poolHistory": [
+        {
+          "epoch": 495,
+          "poolId": "pool1c2wf97p3j9gfvfjshj99ufxerpy3aznm8tzr2fd0ua465s26th4"
+        },
+        {
+          "epoch": 597,
+          "poolId": "pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm"
+        }
+      ],
+      "links": {
+        "stakeKey": "https://cardanoscan.io/stakekey/stake1uy22xxwr0436nhxrmr626yp4y4xyqnvqy5kzvrtr3ls9d6gc3y95z",
+        "pool": "https://cardanoscan.io/pool/pool1lu2luhmkyayq9njh848kfknn6evwzmn3gzsxar7z3sttg7grxcm",
+        "drep": null
+      },
+      "discoverySource": "direct"
+    },
+    {
+      "stakeAddress": "stake1uxuqr63t8nya7ny4efpdj54q2d77twlfvpkefrjumngunrst8tgtg",
+      "account": {
+        "stakeAddress": "stake1uxuqr63t8nya7ny4efpdj54q2d77twlfvpkefrjumngunrst8tgtg",
+        "active": true,
+        "activeEpoch": 548,
+        "controlledAda": 1725948,
+        "rewardsSumAda": 5063,
+        "withdrawalsSumAda": 5063,
+        "reservesSumAda": 0,
+        "treasurySumAda": 0,
+        "withdrawableAda": 0,
+        "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue",
+        "drepId": "drep_always_abstain"
+      },
+      "isGenesis": false,
+      "byronAddressCount": 0,
+      "shelleyAddressCount": 1,
+      "totalAddresses": 1,
+      "sampleAddresses": {
+        "byron": [],
+        "shelley": [
+          "addr1zxhew7fmsup08qvhdnkg8ccra88pw7q5trrncja3dlszhqacq84zk0xfmaxftjjzm9f2q5mauka7jcrdjj89ehx3ex8qa2epvx"
+        ]
+      },
+      "governance": {
+        "drepId": "drep_always_abstain"
+      },
+      "rewardSummary": {
+        "totalEpochs": 14,
+        "firstEpoch": 601,
+        "lastEpoch": 615,
+        "totalRewardsAda": 5063,
+        "avgRewardPerEpoch": 362,
+        "peakEpochReward": 707
+      },
+      "rewardHistory": [
+        {
+          "epoch": 601,
+          "reward": 347,
+          "cumulative": 347,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 602,
+          "reward": 647,
+          "cumulative": 994,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 603,
+          "reward": 629,
+          "cumulative": 1623,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 605,
+          "reward": 274,
+          "cumulative": 1897,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 606,
+          "reward": 391,
+          "cumulative": 2288,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 607,
+          "reward": 226,
+          "cumulative": 2514,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 608,
+          "reward": 107,
+          "cumulative": 2621,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 609,
+          "reward": 108,
+          "cumulative": 2729,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 610,
+          "reward": 224,
+          "cumulative": 2953,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 611,
+          "reward": 110,
+          "cumulative": 3063,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 612,
+          "reward": 691,
+          "cumulative": 3754,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 613,
+          "reward": 707,
+          "cumulative": 4461,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 614,
+          "reward": 237,
+          "cumulative": 4698,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        },
+        {
+          "epoch": 615,
+          "reward": 361,
+          "cumulative": 5059,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        }
+      ],
+      "poolHistory": [
+        {
+          "epoch": 601,
+          "poolId": "pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue"
+        }
+      ],
+      "links": {
+        "stakeKey": "https://cardanoscan.io/stakekey/stake1uxuqr63t8nya7ny4efpdj54q2d77twlfvpkefrjumngunrst8tgtg",
+        "pool": "https://cardanoscan.io/pool/pool19m547w9wkcqm5hcstz67fly4ucz0zsp3dqv4n956xyusy4dlpue",
+        "drep": null
+      },
+      "discoverySource": "direct"
+    }
+  ]
+}

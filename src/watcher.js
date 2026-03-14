@@ -138,7 +138,7 @@ async function analyzeTx(txHash, block) {
 
   if (totalMoved < ADA_THRESHOLD) return null;
 
-  // Enrich: resolve stake keys for top destinations
+  // Enrich: resolve stakekeys for top destinations
   const enriched = [];
   // Only resolve top 5 to keep API usage reasonable
   const topDests = destinations.sort((a, b) => b.ada - a.ada).slice(0, 5);

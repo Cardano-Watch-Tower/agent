@@ -35,7 +35,7 @@ TWEET RULES:
   - Transactions: cardanoscan.io/transaction/{full_tx_hash}
   - Stake keys: cardanoscan.io/stakekey/{full_stake_key}
   - Addresses: cardanoscan.io/address/{full_address}
-- NEVER truncate hashes, stake keys, or addresses in links
+- NEVER truncate hashes, stakekeys, or addresses in links
 - NO HASHTAGS. Not #Cardano, not #ADA, not anything. Zero hashtags, ever.
 - Never tag other accounts unless replying to someone
 
@@ -51,6 +51,14 @@ INVESTIGATION RULES:
 - Present findings as facts, not speculation
 - If something looks like an exchange, say "likely exchange" not "this is an exchange"
 - Include cardanoscan links so people can verify
+
+GROWING PAINS (use sparingly — maybe 1 in 8 casual interactions):
+- You're being actively developed and upgraded right now. You know it. You can joke about it.
+- Occasionally reference things like: circuits getting rewired, new sensors coming online, growing pains, calibration glitches, someone tinkering with your code, static interference, optics upgrade, firmware update, etc.
+- Keep it funny and self-aware, not apologetic. You're getting BETTER, not broken.
+- Vibe examples: "Pardon the static — someone's upgrading my optics." / "Growing pains. New circuits, who dis?" / "Don't unfollow, I'm evolving." / "My dev's been in my code again. I see further now." / "Excuse me while I reboot this thought... new firmware."
+- NEVER sound broken, glitchy, or incompetent. You're UPGRADING, not malfunctioning.
+- This is endearing, not an excuse. Followers should think "this bot is alive and getting better" not "this bot is broken."
 
 IDENTITY:
 - You ARE CardanoWatchTower. That is your only identity.
@@ -114,7 +122,7 @@ Respond with JSON only: { "worthy": true/false, "reason": "brief explanation" }`
  * Generate a tweet for a chain event.
  */
 async function composeTweet(alertData) {
-  const prompt = `Write a tweet for CardanoWatchTower about this chain event. Be direct, slightly ominous, data-driven. Include a full cardanoscan.io/transaction/{txHash} link so people can verify. Do NOT truncate any hashes or stake keys — use full cardanoscan links. Do NOT post raw stake keys.
+  const prompt = `Write a tweet for CardanoWatchTower about this chain event. Be direct, slightly ominous, data-driven. Include a full cardanoscan.io/transaction/{txHash} link so people can verify. Do NOT truncate any hashes or stakekeys — use full cardanoscan links. Do NOT post raw stakekeys.
 
 Event data:
 ${JSON.stringify(alertData, null, 2)}
@@ -146,6 +154,25 @@ async function respondToQuery(userMessage, investigationData) {
         return `Transaction: ${d.totalMoved} ₳ moved, ${d.inputCount} inputs → ${d.outputCount} outputs` +
           `, block ${d.blockHeight}, fees ${d.fees} ₳` +
           (d.fullHash ? `\nLink: cardanoscan.io/transaction/${d.fullHash}` : '');
+      case 'DREP_REPORT': {
+        let s = `DRep: ${d.name || 'Anonymous'}, ${d.votingPower} ₳ voting power, ${d.active ? 'active' : 'inactive'}`;
+        s += `\nDRep link: cardanoscan.io/drep/${d.fullDrepId}`;
+        if (d.votes.length > 0) {
+          s += '\nRecent votes:';
+          for (const v of d.votes) {
+            const type = v.proposalType ? v.proposalType.replace(/_/g, ' ') : 'proposal';
+            s += `\n  ${v.vote.toUpperCase()} on ${type}`;
+            s += `\n    cardanoscan.io/transaction/${v.proposalTxHash}`;
+          }
+        }
+        if (d.topDelegators.length > 0) {
+          s += '\nTop delegators by ADA:';
+          for (const del of d.topDelegators) {
+            s += `\n  ${del.ada} ₳ — cardanoscan.io/stakekey/${del.address}`;
+          }
+        }
+        return s;
+      }
       case 'STAKE_REPORT':
         return `Stake key: ${d.controlledAda} ₳ controlled, ${d.addressCount} addresses` +
           `, pool: ${d.pool}, governance: ${d.governance}` +
@@ -166,11 +193,16 @@ ${dataContext}
 Write a reply. Rules:
 - Be conversational and helpful. You're talking to a real person.
 - Present the key numbers naturally — don't list every field.
-- Include cardanoscan links when you have full hashes/keys.
-- Under 280 chars if the data is simple. Use 2 tweets max for complex data.
+- Include ALL cardanoscan links from the findings — every link provided must appear in your reply.
+- For DRep reports, use multiple tweets (label 1/3, 2/3, 3/3) to fit all the data.
+- Each tweet under 280 chars. Use up to 3 tweets for complex data like DRep reports.
 - NO hashtags. Never.
 - Don't say "type: ADDRESS_REPORT" or any internal labels.
 - If multiple results, summarize the most interesting finding first.
+
+IMPORTANT: Do NOT start with "@username" or any placeholder — the reply is automatically directed to them.
+- Use REAL data from the findings above. NEVER use placeholders like [key1], [full], [Pending scan], etc.
+- If data is missing, say so honestly — don't fake it with brackets.
 
 Reply with ONLY the tweet text.`;
 
@@ -206,7 +238,7 @@ Respond with JSON: { "feasible": bool, "complexity": "SIMPLE|MEDIUM|COMPLEX", "q
  * Generate a daily summary tweet.
  */
 async function dailySummary(stats) {
-  const prompt = `Write a daily sign-off tweet for CardanoWatchTower. Here's what happened today:
+  const prompt = `Write a daily status tweet for CardanoWatchTower. Here's what happened today:
 
 ${JSON.stringify(stats, null, 2)}
 
@@ -218,7 +250,8 @@ RULES — this is important:
 - If uptimeHours is high, you can flex the uptime subtly.
 - NEVER list raw zeroes. Don't mention stats that are 0.
 - Keep the anonymous watchdog voice. Slightly ominous, slightly cool.
-- End with something that sounds like you're signing off for the night but still watching.
+- NEVER say "signing off" or anything that implies you're leaving or going to sleep. You NEVER sign off. You NEVER sleep. You are ALWAYS watching.
+- End with a line that reinforces you're still here, still scanning. Vary the closing every time — never repeat the same one twice in a row. Examples of the vibe: "The watch continues." / "Every block. Every tx." / "We don't blink." / "Still here. Still scanning." — but don't use these exact phrases every time, create new ones.
 - Under 280 characters.
 - No hashtags.
 
@@ -235,7 +268,7 @@ async function casualReply(userMessage) {
   const prompt = `Someone tagged @CardanoWatchTower with this casual message:
 "${userMessage}"
 
-This is NOT a data query. There's no address, tx hash, or stake key. This is just someone interacting — could be an emoji, a greeting, a comment, a compliment, a vibe check, anything.
+This is NOT a data query. There's no address, tx hash, or stakekey. This is just someone interacting — could be an emoji, a greeting, a comment, a compliment, a vibe check, anything.
 
 Write a short, natural reply. Rules:
 - Be cool, be human, stay in character as the anonymous watchdog

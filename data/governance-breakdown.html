@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d1117; font-family: 'Segoe UI', Arial, sans-serif; }
+  .container { width: 1200px; padding: 40px; }
+  h1 { color: #e6edf3; font-size: 26px; text-align: center; margin-bottom: 6px; }
+  .subtitle { color: #8b949e; font-size: 13px; text-align: center; margin-bottom: 30px; }
+  .footer { color: #484f58; font-size: 11px; text-align: center; margin-top: 20px; }
+  .footer span { color: #f97316; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Genesis Funds: Where Is the Governance?</h1>
+  <p class="subtitle">2.63B ADA currently held across 122 traced genesis chains &mdash; governance participation breakdown</p>
+
+  <svg width="1120" height="540" viewBox="0 0 1120 540">
+    <!-- Donut chart simulation using arcs -->
+    <!-- Center: 300, 220, radius: 160 -->
+
+    <!-- 79% - No governance (large gray arc) -->
+    <circle cx="300" cy="220" r="160" fill="none" stroke="#374151" stroke-width="50"
+            stroke-dasharray="802 203" stroke-dashoffset="0" transform="rotate(-90 300 220)"/>
+
+    <!-- 16.1% - Always abstain (yellow) -->
+    <circle cx="300" cy="220" r="160" fill="none" stroke="#f59e0b" stroke-width="50"
+            stroke-dasharray="162 843" stroke-dashoffset="-802" transform="rotate(-90 300 220)"/>
+
+    <!-- 4.7% - Emurgo DRep (red) -->
+    <circle cx="300" cy="220" r="160" fill="none" stroke="#ef4444" stroke-width="50"
+            stroke-dasharray="47 958" stroke-dashoffset="-964" transform="rotate(-90 300 220)"/>
+
+    <!-- 0.3% - No confidence (blue) - too small to see but include -->
+    <circle cx="300" cy="220" r="160" fill="none" stroke="#3b82f6" stroke-width="50"
+            stroke-dasharray="3 1002" stroke-dashoffset="-1011" transform="rotate(-90 300 220)"/>
+
+    <!-- Center text -->
+    <text x="300" y="210" text-anchor="middle" fill="#e6edf3" font-size="28" font-weight="700" font-family="Segoe UI">2.63B</text>
+    <text x="300" y="235" text-anchor="middle" fill="#8b949e" font-size="14" font-family="Segoe UI">ADA tracked</text>
+
+    <!-- Legend - right side -->
+    <rect x="540" y="80" width="540" height="310" rx="10" fill="#1a1e2e" stroke="#30363d" stroke-width="1"/>
+
+    <!-- No governance -->
+    <rect x="570" y="100" width="24" height="24" rx="4" fill="#374151"/>
+    <text x="605" y="115" fill="#e6edf3" font-size="15" font-weight="600" font-family="Segoe UI">79.0% &mdash; No Governance</text>
+    <text x="605" y="133" fill="#8b949e" font-size="12" font-family="Segoe UI">~2.08B ADA &mdash; Pool staking only, zero DRep delegation</text>
+    <text x="605" y="148" fill="#8b949e" font-size="11" font-family="Segoe UI">Earns staking rewards but has zero say in governance decisions</text>
+
+    <!-- Always abstain -->
+    <rect x="570" y="170" width="24" height="24" rx="4" fill="#f59e0b"/>
+    <text x="605" y="185" fill="#f59e0b" font-size="15" font-weight="600" font-family="Segoe UI">16.1% &mdash; Always Abstain</text>
+    <text x="605" y="203" fill="#8b949e" font-size="12" font-family="Segoe UI">~422M ADA &mdash; Coordinated treasury abstention (11+ keys, 32M each)</text>
+    <text x="605" y="218" fill="#8b949e" font-size="11" font-family="Segoe UI">Deliberately opts out. If this ever changed its vote, outcomes shift.</text>
+
+    <!-- Emurgo DRep -->
+    <rect x="570" y="240" width="24" height="24" rx="4" fill="#ef4444"/>
+    <text x="605" y="255" fill="#ef4444" font-size="15" font-weight="600" font-family="Segoe UI">4.7% &mdash; Emurgo DRep (Circular)</text>
+    <text x="605" y="273" fill="#8b949e" font-size="12" font-family="Segoe UI">~123M ADA &mdash; Genesis funds delegated back to founding entity's DRep</text>
+    <text x="605" y="288" fill="#8b949e" font-size="11" font-family="Segoe UI">The ONLY real governance participation. Self-referential loop.</text>
+
+    <!-- No confidence -->
+    <rect x="570" y="310" width="24" height="24" rx="4" fill="#3b82f6"/>
+    <text x="605" y="325" fill="#3b82f6" font-size="15" font-weight="600" font-family="Segoe UI">0.3% &mdash; No Confidence</text>
+    <text x="605" y="343" fill="#8b949e" font-size="12" font-family="Segoe UI">~8M ADA &mdash; Single whale, permanent opposition stance</text>
+
+    <!-- Independent DRep -->
+    <rect x="570" y="365" width="24" height="24" rx="4" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="4 3"/>
+    <text x="605" y="380" fill="#22c55e" font-size="15" font-weight="600" font-family="Segoe UI">0.0% &mdash; Independent Community DRep</text>
+    <text x="605" y="398" fill="#8b949e" font-size="12" font-family="Segoe UI">0 ADA &mdash; Not a single tracked genesis ADA participates through a</text>
+    <text x="605" y="413" fill="#8b949e" font-size="12" font-family="Segoe UI">community-elected representative</text>
+
+    <!-- Bottom callout -->
+    <rect x="30" y="430" width="1060" height="95" rx="8" fill="#2a1a1a" stroke="#ef4444" stroke-width="2"/>
+    <text x="560" y="458" text-anchor="middle" fill="#ef4444" font-size="16" font-weight="700" font-family="Segoe UI">The staking economic incentive works. The governance incentive does not.</text>
+    <text x="560" y="482" text-anchor="middle" fill="#e6edf3" font-size="12" font-family="Segoe UI">95% of genesis ADA either ignores governance entirely or deliberately abstains.</text>
+    <text x="560" y="502" text-anchor="middle" fill="#e6edf3" font-size="12" font-family="Segoe UI">The remaining 5% circles back to a founding entity. Zero community participation.</text>
+  </svg>
+
+  <p class="footer">Data: Blockfrost API | 122 chains, 14.8B ADA traced | Epoch 617 | <span>CardanoWatchTower</span></p>
+</div>
+</body>
+</html>

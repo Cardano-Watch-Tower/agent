@@ -150,7 +150,7 @@ async function detectTokenEvents(txHash, block) {
 }
 
 /**
- * Check if a specific stake key changed its DRep delegation.
+ * Check if a specific stakekey changed its DRep delegation.
  * Useful for monitoring known genesis-linked keys.
  */
 async function checkDrepChange(stakeKey, knownDrep) {

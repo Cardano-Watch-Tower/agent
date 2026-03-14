@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d1117; font-family: 'Segoe UI', Arial, sans-serif; }
+  .container { width: 1200px; padding: 40px; }
+  h1 { color: #e6edf3; font-size: 26px; text-align: center; margin-bottom: 6px; }
+  .subtitle { color: #8b949e; font-size: 13px; text-align: center; margin-bottom: 30px; }
+  .footer { color: #484f58; font-size: 11px; text-align: center; margin-top: 20px; }
+  .footer span { color: #f97316; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>The Circular Governance Loop</h1>
+  <p class="subtitle">Genesis funds &rarr; Emurgo DRep &rarr; Emurgo votes on governance &mdash; 30.8% of DRep voting power traces to genesis</p>
+
+  <svg width="1120" height="620" viewBox="0 0 1120 620">
+    <defs>
+      <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#f97316"/>
+      </marker>
+      <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
+      </marker>
+      <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#a855f7"/>
+      </marker>
+      <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+      </marker>
+    </defs>
+
+    <!-- STEP 1: Genesis Block -->
+    <rect x="30" y="30" width="220" height="70" rx="10" fill="#1a1e2e" stroke="#8b949e" stroke-width="2"/>
+    <text x="140" y="58" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="600" font-family="Segoe UI">Genesis Block</text>
+    <text x="140" y="78" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">5.185B ADA dev pool</text>
+
+    <!-- Arrow 1 -->
+    <path d="M 250 65 L 330 65" stroke="#f97316" stroke-width="2" fill="none" marker-end="url(#arrowOrange)"/>
+    <text x="290" y="55" text-anchor="middle" fill="#f97316" font-size="10" font-family="Segoe UI">40%</text>
+
+    <!-- STEP 2: Emurgo Allocation -->
+    <rect x="340" y="30" width="220" height="70" rx="10" fill="#1a1e2e" stroke="#f97316" stroke-width="2"/>
+    <text x="450" y="58" text-anchor="middle" fill="#f97316" font-size="15" font-weight="600" font-family="Segoe UI">Emurgo</text>
+    <text x="450" y="78" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">2.07B ADA allocation</text>
+
+    <!-- Arrow 2 -->
+    <path d="M 560 65 L 640 65" stroke="#f97316" stroke-width="2" fill="none" marker-end="url(#arrowOrange)"/>
+    <text x="600" y="55" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI">15+ hops</text>
+
+    <!-- STEP 3: Byron Cascades -->
+    <rect x="650" y="30" width="220" height="70" rx="10" fill="#1a1e2e" stroke="#8b949e" stroke-width="1" stroke-dasharray="6 3"/>
+    <text x="760" y="58" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="600" font-family="Segoe UI">Byron Cascades</text>
+    <text x="760" y="78" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">385 addresses traversed</text>
+
+    <!-- Arrow 3 down -->
+    <path d="M 760 100 L 760 150" stroke="#f97316" stroke-width="2" fill="none" marker-end="url(#arrowOrange)"/>
+
+    <!-- STEP 4: Shelley Endpoints -->
+    <rect x="620" y="160" width="280" height="70" rx="10" fill="#1a1e2e" stroke="#f97316" stroke-width="2"/>
+    <text x="760" y="188" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="600" font-family="Segoe UI">Shelley Stake Keys</text>
+    <text x="760" y="208" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">41 chains | 123M ADA traced from genesis</text>
+
+    <!-- Arrow 4 down to DRep -->
+    <path d="M 760 230 L 760 290" stroke="#a855f7" stroke-width="3" fill="none" marker-end="url(#arrowPurple)"/>
+    <text x="780" y="265" fill="#a855f7" font-size="12" font-weight="600" font-family="Segoe UI">DRep delegate</text>
+
+    <!-- STEP 5: Emurgo DRep - THE CENTER -->
+    <rect x="520" y="300" width="480" height="110" rx="12" fill="#1a1e2e" stroke="#ef4444" stroke-width="3"/>
+    <text x="760" y="328" text-anchor="middle" fill="#ef4444" font-size="18" font-weight="700" font-family="Segoe UI">EMURGO DRep</text>
+    <text x="760" y="350" text-anchor="middle" fill="#e6edf3" font-size="13" font-family="Segoe UI">drep1ytvlwvy...gpyahug</text>
+    <text x="760" y="372" text-anchor="middle" fill="#f97316" font-size="14" font-weight="700" font-family="Segoe UI">297.6M ADA voting power | 402 delegators</text>
+    <text x="760" y="392" text-anchor="middle" fill="#ef4444" font-size="13" font-weight="600" font-family="Segoe UI">91.8M ADA (30.8%) traces back to genesis</text>
+
+    <!-- CIRCULAR ARROW - from DRep back up to Emurgo label -->
+    <path d="M 520 355 C 350 355, 350 200, 350 65 L 340 65" stroke="#ef4444" stroke-width="3" fill="none" stroke-dasharray="10 5" marker-end="url(#arrowRed)"/>
+    <text x="300" y="210" fill="#ef4444" font-size="13" font-weight="700" font-family="Segoe UI" transform="rotate(-90,300,210)">CIRCULAR</text>
+
+    <!-- Moonstake pools feeding in from left -->
+    <rect x="30" y="290" width="200" height="130" rx="10" fill="#1a1e2e" stroke="#3b82f6" stroke-width="2"/>
+    <text x="130" y="315" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="600" font-family="Segoe UI">Moonstake Pools</text>
+    <text x="130" y="335" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">MS4 | MS5 | MS6</text>
+    <text x="130" y="355" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">Emurgo-affiliated service</text>
+    <text x="130" y="380" text-anchor="middle" fill="#f97316" font-size="12" font-weight="600" font-family="Segoe UI">107M ADA delegated</text>
+    <text x="130" y="400" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI">4 of top 6 registered epoch 550</text>
+    <text x="130" y="415" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI">(Conway governance launch)</text>
+
+    <!-- Arrow from Moonstake to DRep -->
+    <path d="M 230 355 L 520 355" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrowPurple)"/>
+    <text x="375" y="345" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI">DRep delegate</text>
+
+    <!-- Top delegator with EMUR1 pool -->
+    <rect x="30" y="160" width="200" height="100" rx="10" fill="#1a1e2e" stroke="#f97316" stroke-width="2"/>
+    <text x="130" y="183" text-anchor="middle" fill="#e6edf3" font-size="13" font-weight="600" font-family="Segoe UI">Top Delegator</text>
+    <text x="130" y="200" text-anchor="middle" fill="#f97316" font-size="12" font-weight="700" font-family="Segoe UI">58.8M ADA</text>
+    <text x="130" y="218" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">Pool: EMUR1 (Emurgo 1)</text>
+    <text x="130" y="235" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">DRep: Emurgo</text>
+    <text x="130" y="252" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="600" font-family="Segoe UI">Epoch 253 (early era)</text>
+
+    <!-- Arrow from top delegator to DRep -->
+    <path d="M 130 260 L 130 290" stroke="#f97316" stroke-width="1" fill="none" stroke-dasharray="4 3"/>
+
+    <!-- Result box -->
+    <rect x="30" y="455" width="1060" height="55" rx="8" fill="#1a1e2e" stroke="#a855f7" stroke-width="2"/>
+    <text x="560" y="478" text-anchor="middle" fill="#a855f7" font-size="14" font-weight="700" font-family="Segoe UI">5.11% of total Cardano governance voting power flows through Emurgo's DRep</text>
+    <text x="560" y="498" text-anchor="middle" fill="#e6edf3" font-size="12" font-family="Segoe UI">0% of traced genesis ADA delegates to any independent community DRep</text>
+
+    <!-- Key findings -->
+    <rect x="30" y="530" width="1060" height="75" rx="8" fill="#2a1a1a" stroke="#ef4444" stroke-width="2"/>
+    <text x="560" y="555" text-anchor="middle" fill="#ef4444" font-size="14" font-weight="700" font-family="Segoe UI">The Loop: Genesis Allocation &#8594; Byron Cascades &#8594; Shelley Keys &#8594; Emurgo DRep &#8594; Emurgo Governs</text>
+    <text x="560" y="578" text-anchor="middle" fill="#e6edf3" font-size="12" font-family="Segoe UI">The only real governance participation from genesis funds circles back to a founding entity. Self-referential. Not distributed.</text>
+    <text x="560" y="596" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Segoe UI">122 chains traced | 14.8B ADA tracked | Blockfrost API verified | Epoch 617</text>
+  </svg>
+
+  <p class="footer">Data: Blockfrost API + Genesis Byron JSON | <span>CardanoWatchTower</span> | Full report: github.com/Cardano-Watch-Tower/watchers</p>
+</div>
+</body>
+</html>

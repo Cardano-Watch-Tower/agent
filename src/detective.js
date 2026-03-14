@@ -11,7 +11,7 @@
  *
  * Job types:
  *   - TRACE: Follow money through the chain
- *   - PROFILE: Full analysis of an address/stake key
+ *   - PROFILE: Full analysis of an address/stakekey
  *   - MONITOR: Watch an address for activity (ongoing)
  *   - GOVERNANCE: Check governance participation of funds
  */
