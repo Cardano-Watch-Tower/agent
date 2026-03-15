@@ -161,12 +161,21 @@ async function searchAndEngage(results) {
   const tweets = await searchTweets(query, 15);
   results.searched = tweets.length;
 
-  // Keyword filter — only send to Grok if the tweet has substance
+  // Keyword filter — only engage if tweet is actually about Cardano
   const filtered = tweets.filter(tweet => {
     if (tweet.authorUsername === BOT_USERNAME) return false;
     if (engaged.liked.has(tweet.id) && engaged.replied.has(tweet.id)) return false;
 
     const lower = tweet.text.toLowerCase();
+
+    // Reject non-Cardano chains (Solana tokens named $ADA, ETH stuff, etc.)
+    const NON_CARDANO = ['sol ', 'solana', 'ethereum', 'eth ', 'bnb ', 'bsc', 'ca:', 'contract:', '0x', 'pump.fun', 'raydium', 'jupiter', 'pancakeswap', 'uniswap'];
+    if (NON_CARDANO.some(bad => lower.includes(bad))) return false;
+
+    // Must have at least one Cardano-specific keyword
+    const CARDANO_REQUIRED = ['cardano', 'ada', 'drep', 'stakekey', 'epoch', 'plutus', 'marlowe', 'blockfrost', 'cardanoscan', 'minswap', 'sundaeswap', 'liqwid', 'iohk', 'emurgo', 'catalyst'];
+    if (!CARDANO_REQUIRED.some(kw => lower.includes(kw))) return false;
+
     return ENGAGEMENT_KEYWORDS.some(kw => lower.includes(kw));
   });
 
