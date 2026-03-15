@@ -2,7 +2,8 @@
  * MESSENGER — Communication service for CardanoWatchers
  *
  * Handles:
- *   - Email notifications via Outlook SMTP (nodemailer)
+ *   - Telegram notifications (primary channel)
+ *   - Email notifications via Outlook SMTP (nodemailer) (backup)
  *   - Filesystem message queue (inbox/outbox/archive)
  *   - Escalation system (info → warning → critical)
  *   - Daily/monthly report emails
@@ -13,6 +14,7 @@
  */
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -23,6 +25,9 @@ const GMAIL_USER = process.env.GMAIL_USER || 'cardanowatchtower@gmail.com';
 const GMAIL_PASS = process.env.GMAIL_PASS;
 const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || 'tcl@therefreshcnft.com';
 const MESSAGES_DIR = process.env.MESSAGES_DIR || path.join(__dirname, '..', 'messages');
+
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 const INBOX_DIR = path.join(MESSAGES_DIR, 'inbox');
 
@@ -60,6 +65,68 @@ function getTransporter() {
   return transporter;
 }
 
+// ─── Telegram Functions ─────────────────────────────────────
+
+async function sendTelegram(text) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.log('⚠️  Messenger: No Telegram credentials — skipped');
+    return false;
+  }
+
+  // Telegram has a 4096 char limit — truncate if needed
+  const maxLen = 4000;
+  const truncated = text.length > maxLen
+    ? text.substring(0, maxLen) + '\n\n... (truncated)'
+    : text;
+
+  return new Promise((resolve) => {
+    const postData = JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: truncated
+    });
+
+    const options = {
+      hostname: 'api.telegram.org',
+      port: 443,
+      path: `/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          const result = JSON.parse(data);
+          if (result.ok) {
+            const preview = truncated.split('\n')[0].substring(0, 50);
+            console.log(`📱 Telegram sent: ${preview}...`);
+            resolve(true);
+          } else {
+            console.error(`📱 Telegram error: ${result.description}`);
+            resolve(false);
+          }
+        } catch (e) {
+          console.error(`📱 Telegram parse error: ${e.message}`);
+          resolve(false);
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      console.error(`📱 Telegram request error: ${e.message}`);
+      resolve(false);
+    });
+
+    req.write(postData);
+    req.end();
+  });
+}
+
 // ─── Email Functions ────────────────────────────────────────
 
 async function sendEmail(to, subject, body) {
@@ -90,7 +157,26 @@ async function sendEmail(to, subject, body) {
 }
 
 async function sendEmailToOwner(subject, body) {
-  return sendEmail(NOTIFY_EMAIL, subject, body);
+  let sent = false;
+
+  // Primary: Telegram
+  if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+    const telegramText = `[CW] ${subject}\n\n${body}`;
+    sent = await sendTelegram(telegramText);
+  }
+
+  // Backup: Email (if configured)
+  if (GMAIL_PASS) {
+    const emailSent = await sendEmail(NOTIFY_EMAIL, subject, body);
+    sent = sent || emailSent;
+  }
+
+  // Last resort: outbox file
+  if (!sent) {
+    writeOutbox(NOTIFY_EMAIL, subject, body, 'warning');
+  }
+
+  return sent;
 }
 
 // ─── Filesystem Message Queue ───────────────────────────────
@@ -177,7 +263,7 @@ async function escalate(issue, severity = 'info', details = '') {
   // Always write to outbox
   writeOutbox(NOTIFY_EMAIL, `Escalation: ${issue}`, body, severity);
 
-  // Email for warning and critical
+  // Telegram + email for warning and critical
   if (severity === 'warning' || severity === 'critical') {
     await sendEmailToOwner(`${severity.toUpperCase()}: ${issue}`, body);
   }
@@ -193,11 +279,11 @@ async function shutdown(reason = 'Unknown') {
   console.log(`🛑 Shutdown initiated: ${reason}`);
   writeOutbox(NOTIFY_EMAIL, `Shutdown: ${reason}`, body, 'critical');
 
-  // Try to send email (best-effort, don't block shutdown)
+  // Try to send notification (best-effort, don't block shutdown)
   try {
     await sendEmailToOwner(`Shutdown: ${reason}`, body);
   } catch (e) {
-    console.error(`Could not send shutdown email: ${e.message}`);
+    console.error(`Could not send shutdown notification: ${e.message}`);
   }
 }
 
@@ -373,12 +459,16 @@ async function processMessages() {
 // ─── Health Check ───────────────────────────────────────────
 
 function isConfigured() {
-  return !!(GMAIL_PASS && GMAIL_USER);
+  const hasTelegram = !!(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID);
+  const hasEmail = !!(GMAIL_PASS && GMAIL_USER);
+  return hasTelegram || hasEmail;
 }
 
 function status() {
   return {
     configured: isConfigured(),
+    telegramConfigured: !!(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID),
+    emailConfigured: !!(GMAIL_PASS && GMAIL_USER),
     gmailUser: GMAIL_USER,
     notifyEmail: NOTIFY_EMAIL,
     messagesDir: MESSAGES_DIR,
@@ -391,6 +481,9 @@ function status() {
 // ─── Exports ────────────────────────────────────────────────
 
 module.exports = {
+  // Telegram
+  sendTelegram,
+
   // Email
   sendEmail,
   sendEmailToOwner,
