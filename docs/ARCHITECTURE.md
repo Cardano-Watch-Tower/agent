@@ -34,7 +34,7 @@ index.js (orchestrator)
 | `src/followups.js` | Promise detection + delivery queue |
 | `src/engager.js` | Community engagement. Search, like, follow, reply with value |
 | `src/analyst.js` | Error pattern detection and X safety circuit breaker |
-| `src/messenger.js` | Notification service. Email alerts, escalations, hourly status |
+| `src/messenger.js` | Notification service. Telegram (primary), email (backup), escalations, hourly status |
 | `src/watcher.js` | Blockfrost chain poller. Whale transactions (>5M ADA) |
 | `src/detective.js` | Investigation engine for user-requested on-chain lookups |
 | `src/repo-monitor.js` | GitHub repo watcher |
@@ -76,14 +76,25 @@ index.js runs 10 concurrent loops:
 ### Circuit Breaker (analyst.js)
 - 2 X-interaction errors = 5-minute freeze on ALL X loops
 - After freeze, strikes reset and loops resume
-- Same error 5+ times in 6 hours triggers email alert
+- Same error 5+ times in 6 hours triggers Telegram alert
 
 ### Auto Re-Login (browser.js - ensureLoggedIn)
 - Called before every X interaction
 - If session valid, returns immediately
 - If expired: Cycle 1 (2 attempts), 2 min wait, Cycle 2 (2 attempts)
-- After 4 total failures: permanent stop, emails owner, never retries until restart
+- After 4 total failures: permanent stop, Telegram notification to owner, never retries until restart
 - Uses email-based login (X_USERNAME = email in .env)
+
+### Crash Protection (index.js)
+- `unhandledRejection` handler: sends `[CW CRASH]` to Telegram, saves stats, exits
+- `uncaughtException` handler: sends `[CW CRASH]` to Telegram, saves stats, exits
+- Ensures agent never dies silently — owner always gets notified
+
+### Notifications (messenger.js)
+- Primary: Telegram bot (WeBotCWT / @WeBotCWT_bot)
+- Backup: Email (Gmail dead, Outlook not yet configured)
+- Fallback: Filesystem outbox (messages/outbox/*.json)
+- All notifications route through sendEmailToOwner() which tries Telegram first
 
 ### Thread Reply Chaining (poster.js + index.js)
 - Each chunk replies to the previous chunk (proper thread)
@@ -94,6 +105,14 @@ index.js runs 10 concurrent loops:
 ### Engagement Caps (engager.js)
 - Daily randomized targets within ranges
 - Caps persist to daily-stats.json to survive restarts
+- Keyword filter rejects non-Cardano content (SOL, ETH, BNB, contract addresses, DEX platforms)
+- Requires Cardano-specific keyword before engaging (cardano, ada, drep, epoch, plutus, etc.)
+
+### Thought Accuracy (brain.js + index.js)
+- Recent whale alerts tracked in `recentAlerts` array (last 10)
+- generateThought() receives real tx data with cardanoscan links when available
+- When no alert data: prompt explicitly forbids referencing specific transactions or inventing data
+- Thoughts without real data are philosophical/analytical observations only
 
 ## Key Design Decisions
 
