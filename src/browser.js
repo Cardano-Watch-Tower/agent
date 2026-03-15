@@ -380,20 +380,29 @@ async function login(username, password) {
   await page.goto('https://x.com/i/flow/login', { waitUntil: 'networkidle2', timeout: 30000 });
   await sleep(3000);
 
-  // Step 1: Enter username
-  const usernameInput = await page.waitForSelector('input[autocomplete="username"]', { timeout: 15000 });
-  await usernameInput.type(username, { delay: 50 });
+  // Step 1: Enter username — insertText + Tab (to sync React state) + Enter (to submit)
+  await page.waitForSelector('input[autocomplete="username"]', { timeout: 20000 });
+  await page.focus('input[autocomplete="username"]');
   await sleep(800);
-
-  await clickButtonWithText(page, ['Next']);
-  await sleep(3000);
+  const cdp1 = await page.createCDPSession();
+  await cdp1.send('Input.insertText', { text: username });
+  await cdp1.detach();
+  await sleep(500);
+  await page.keyboard.press('Tab');   // blur — triggers React onChange with typed value
+  await sleep(600);
+  await screenshot('after-type-username');
+  // Press Enter to submit (more reliable than button-click for React forms)
+  await page.keyboard.press('Enter');
+  await sleep(2000);
+  await screenshot('after-click-next');
+  await sleep(2000);
 
   // Step 2: X may show a verification step before password (OCF flow)
   // Wait for EITHER the verification input OR the password input
   const afterUsername = await waitForAny(page, [
     'input[data-testid="ocfEnterTextTextInput"]',
     'input[autocomplete="current-password"]'
-  ], 12000);
+  ], 20000);
 
   if (!afterUsername) {
     await screenshot('login-after-username');
@@ -411,10 +420,14 @@ async function login(username, password) {
     await sleep(3000);
   }
 
-  // Step 3: Password
-  const passwordInput = await page.waitForSelector('input[autocomplete="current-password"]', { timeout: 15000 });
-  await passwordInput.type(password, { delay: 50 });
-  await sleep(500);
+  // Step 3: Password — CDP insertText
+  await page.waitForSelector('input[autocomplete="current-password"]', { timeout: 15000 });
+  await page.focus('input[autocomplete="current-password"]');
+  await sleep(800);
+  const cdp2 = await page.createCDPSession();
+  await cdp2.send('Input.insertText', { text: password });
+  await cdp2.detach();
+  await sleep(600);
 
   await clickButtonWithText(page, ['Log in']);
 
@@ -530,12 +543,109 @@ async function close() {
   }
 }
 
+
+// --- Auto Re-Login with Suspension-Safe Limits ---
+// 4 attempts max: 2 strikes, 2 min wait, 2 more strikes, then full stop.
+// Emails owner on permanent failure.
+let _reloginDead = false;
+let _reloginAttempts = 0;
+
+async function ensureLoggedIn() {
+  if (_reloginDead) return false;
+
+  try {
+    const loggedIn = await isLoggedIn();
+    if (loggedIn) return true;
+  } catch (e) {
+    console.log('ensureLoggedIn check failed: ' + e.message);
+  }
+
+  console.log('Session expired. Starting re-login sequence (max 4 attempts)...');
+
+  const username = process.env.X_USERNAME;
+  const password = process.env.X_PASSWORD;
+  if (!username || !password) {
+    console.log('No X_USERNAME/X_PASSWORD in .env - cannot re-login');
+    _reloginDead = true;
+    _notifyLoginDead('No credentials in .env');
+    return false;
+  }
+
+  // Cycle 1: strikes 1 and 2
+  for (let strike = 1; strike <= 2; strike++) {
+    _reloginAttempts++;
+    console.log('Re-login attempt ' + _reloginAttempts + '/4 (cycle 1, strike ' + strike + ')...');
+    try {
+      const success = await login(username, password);
+      if (success) {
+        console.log('Re-login succeeded on attempt ' + _reloginAttempts);
+        _reloginAttempts = 0;
+        return true;
+      }
+    } catch (e) {
+      console.log('Re-login attempt ' + _reloginAttempts + ' failed: ' + e.message);
+    }
+  }
+
+  // Wait 2 minutes between cycles
+  console.log('Re-login cycle 1 failed. Waiting 2 minutes before cycle 2...');
+  await sleep(120000);
+
+  // Cycle 2: strikes 3 and 4
+  for (let strike = 1; strike <= 2; strike++) {
+    _reloginAttempts++;
+    console.log('Re-login attempt ' + _reloginAttempts + '/4 (cycle 2, strike ' + strike + ')...');
+    try {
+      const success = await login(username, password);
+      if (success) {
+        console.log('Re-login succeeded on attempt ' + _reloginAttempts);
+        _reloginAttempts = 0;
+        return true;
+      }
+    } catch (e) {
+      console.log('Re-login attempt ' + _reloginAttempts + ' failed: ' + e.message);
+    }
+  }
+
+  // All 4 attempts failed - permanent stop
+  console.log('RE-LOGIN PERMANENTLY FAILED after 4 attempts. All X loops will fail until restart.');
+  _reloginDead = true;
+  _reloginAttempts = 0;
+  _notifyLoginDead('4 consecutive login attempts failed');
+  return false;
+}
+
+function _notifyLoginDead(reason) {
+  try {
+    const messenger = require('./messenger');
+    const lines = [
+      'The agent failed to re-login to X after 4 attempts.',
+      '',
+      'Reason: ' + reason,
+      '',
+      'All X loops (posting, engagement, mentions, etc.) are dead.',
+      'The agent process is still running but cannot interact with X.',
+      '',
+      'Action required: SSH into the server and run:',
+      '  node src/login.js',
+      '',
+      'Or provide fresh cookies via .cookies.json and restart the agent.'
+    ];
+    messenger.sendEmailToOwner(
+      'CRITICAL: CardanoWatchers X login permanently failed',
+      lines.join('\n')
+    );
+  } catch (e) {
+    console.log('Could not send login-failure email: ' + e.message);
+  }
+}
+
 function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
 module.exports = {
-  launch, goto, isLoggedIn, login,
+  launch, goto, isLoggedIn, login, ensureLoggedIn,
   humanType, click, waitFor, getText,
   screenshot, getPage, close,
   saveCookies, loadCookies, sleep, withLock

@@ -47,7 +47,7 @@ let transporter = null;
 function getTransporter() {
   if (!transporter && GMAIL_PASS) {
     transporter = nodemailer.createTransport({
-      host: 'smtp-mail.outlook.com',
+      host: 'smtp.gmail.com',
       port: 587,
       secure: false,
       auth: {

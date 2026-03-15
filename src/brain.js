@@ -278,8 +278,9 @@ Write a reply. Rules:
 - Be conversational and helpful. You're talking to a real person.
 - Present key numbers naturally — not every field.
 - Include ALL cardanoscan links from the findings — every link provided must appear.
-- For DRep reports, use multiple tweets (label 1/3, 2/3, 3/3) to fit all data.
-- Each tweet under 280 chars. Use up to 3 tweets for complex DRep data.
+- For DRep reports with lots of data, write a longer response. We will split it into tweets automatically.
+- Do NOT add numbering like 1/3, 2/3 — we handle that.
+- Do NOT include @CardanoWatchers or any @mention in your reply. The reply system adds mentions automatically.
 - NO hashtags. Never.
 - Don't say "type: ADDRESS_REPORT" or any internal labels.
 - Summarize the most interesting finding first.

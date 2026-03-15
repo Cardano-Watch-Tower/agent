@@ -14,7 +14,7 @@
  *   - Attaching images to tweets and replies
  */
 const browser = require('./browser');
-const { withLock } = browser;
+const { withLock, ensureLoggedIn } = browser;
 const fs = require('fs');
 const path = require('path');
 
@@ -173,10 +173,15 @@ async function postTweet(text, options = null) {
   await browser.goto('https://x.com/home', 'domcontentloaded');
   await browser.sleep(2000);
 
-  // Verify still logged in
+  // Verify still logged in — attempt re-login if expired
   const currentUrl = page.url();
   if (currentUrl.includes('/login') || currentUrl.includes('/i/flow/login')) {
-    throw new Error('X session expired — not logged in');
+    console.log('X session expired during postTweet — attempting re-login...');
+    const recovered = await ensureLoggedIn();
+    if (!recovered) throw new Error('X session expired — re-login failed');
+    // Re-navigate after successful re-login
+    await browser.goto('https://x.com/home', 'domcontentloaded');
+    await browser.sleep(2000);
   }
 
   // Click the compose area
@@ -230,18 +235,24 @@ async function postTweet(text, options = null) {
  * @param {string} text - Reply text
  * @param {string|null} imagePath - Optional image to attach
  */
-async function replyToTweet(tweetId, text, imagePath = null) {
-  // Rate limit check — new account safety
-  const rateCheck = _checkRateLimit();
-  if (rateCheck === false) return false;  // Daily cap hit
-  if (typeof rateCheck === 'number') {
-    await new Promise(r => setTimeout(r, rateCheck * 1000));  // Wait for gap
+async function replyToTweet(tweetId, text, imagePath = null, options = {}) {
+  // Rate limit check — skip for thread continuations (they count as 1 post)
+  if (!options.isThreadContinuation) {
+    const rateCheck = _checkRateLimit();
+    if (rateCheck === false) return false;  // Daily cap hit
+    if (typeof rateCheck === 'number') {
+      await new Promise(r => setTimeout(r, rateCheck * 1000));  // Wait for gap
+    }
   }
 
   const page = await browser.getPage();
 
   // Ensure viewport is tall enough for reply UI
   await page.setViewport({ width: 1280, height: 1800 });
+
+  // Ensure logged in before replying
+  const sessionOk = await ensureLoggedIn();
+  if (!sessionOk) throw new Error('X session expired — re-login failed');
 
   // If tweetId is a URL, go directly. Otherwise construct URL.
   const url = tweetId.startsWith('http') ? tweetId :
@@ -323,9 +334,28 @@ async function replyToTweet(tweetId, text, imagePath = null) {
 
     await browser.sleep(5000);
     await browser.saveCookies();
-    _recordPost();
+    if (!options.isThreadContinuation) _recordPost();
     console.log(`✓ Replied to ${tweetId}${imagePath ? ' (with image)' : ''}: ${text.substring(0, 80)}...`);
-    return true;
+
+    // Find the new tweet's ID by checking bot's latest tweet
+    try {
+      await browser.goto(`https://x.com/${BOT_USERNAME}`);
+      await browser.sleep(3000);
+      const newTweetId = await (await browser.getPage()).evaluate(() => {
+        const tweets = document.querySelectorAll('article[data-testid="tweet"]');
+        if (tweets.length > 0) {
+          const link = tweets[0].querySelector('a[href*="/status/"]');
+          if (link) {
+            const match = link.href.match(/\/status\/(\d+)/);
+            return match ? match[1] : null;
+          }
+        }
+        return null;
+      });
+      return newTweetId || true;
+    } catch (e) {
+      return true;  // Posted but couldn't get ID
+    }
   } catch (e) {
     console.error(`✗ Reply failed: ${e.message}`);
     await browser.screenshot('reply-failed');
@@ -389,6 +419,9 @@ async function postThread(tweets) {
  * Returns array of { id, text, authorUsername, authorName }.
  */
 async function getMentions(lastSeenId = null) {
+  const sessionOk = await ensureLoggedIn();
+  if (!sessionOk) throw new Error('X session expired — re-login failed');
+
   const page = await browser.getPage();
 
   await browser.goto('https://x.com/notifications/mentions');
@@ -452,14 +485,17 @@ async function getMentions(lastSeenId = null) {
 /**
  * Reply to a tweet (alias for replyToTweet).
  */
-async function reply(tweetId, text) {
-  return replyToTweet(tweetId, text);
+async function reply(tweetId, text, imagePath = null, options = {}) {
+  return replyToTweet(tweetId, text, imagePath, options);
 }
 
 /**
  * Like a tweet by navigating to it and clicking the heart.
  */
 async function likeTweet(tweetIdOrUrl) {
+  const sessionOk = await ensureLoggedIn();
+  if (!sessionOk) return false;
+
   const page = await browser.getPage();
   const url = tweetIdOrUrl.startsWith('http') ? tweetIdOrUrl :
     `https://x.com/i/status/${tweetIdOrUrl}`;
@@ -482,6 +518,9 @@ async function likeTweet(tweetIdOrUrl) {
  * Follow a user by navigating to their profile.
  */
 async function followUser(username) {
+  const sessionOk = await ensureLoggedIn();
+  if (!sessionOk) return false;
+
   const page = await browser.getPage();
   await browser.goto(`https://x.com/${username}`);
   await browser.sleep(2000);
@@ -518,6 +557,9 @@ async function followUser(username) {
  * Returns array of { text, authorUsername, tweetUrl, metrics }.
  */
 async function searchTweets(query, maxResults = 10) {
+  const sessionOk = await ensureLoggedIn();
+  if (!sessionOk) throw new Error('X session expired — re-login failed');
+
   const page = await browser.getPage();
   const searchUrl = `https://x.com/search?q=${encodeURIComponent(query)}&f=live`;
 

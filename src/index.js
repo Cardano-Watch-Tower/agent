@@ -270,11 +270,14 @@ async function handleQuery(mention, text) {
 
     const tweets = splitForThread(replyText);
     if (!DRY_RUN) {
-      for (const t of tweets) {
-        await reply(String(mention.id), t);
-        await sleep(2000);
+      let replyToId = String(mention.id);
+      for (let i = 0; i < tweets.length; i++) {
+        const isFirst = (i === 0);
+        const newId = await reply(replyToId, tweets[i], null, { isThreadContinuation: !isFirst });
+        if (newId && typeof newId === 'string') replyToId = newId;
+        if (i < tweets.length - 1) await sleep(30000);  // 30s between thread chunks
       }
-      stats.tweetsPosted += tweets.length;
+      stats.tweetsPosted += 1;  // Whole thread counts as 1
     }
     console.log(`  Reply (${tweets.length} tweets): ${tweets[0]?.substring(0, 80)}...`);
     checkForPromise(mention, text, replyText);
@@ -309,11 +312,14 @@ async function handleDetectiveRequest(mention, text) {
           const replyText = await respondToQuery(text, data);
           const tweets = splitForThread(replyText);
           if (!DRY_RUN) {
-            for (const t of tweets) {
-              await reply(String(mention.id), t);
-              await sleep(2000);
+            let replyToId = String(mention.id);
+            for (let i = 0; i < tweets.length; i++) {
+              const isFirst = (i === 0);
+              const newId = await reply(replyToId, tweets[i], null, { isThreadContinuation: !isFirst });
+              if (newId && typeof newId === 'string') replyToId = newId;
+              if (i < tweets.length - 1) await sleep(30000);
             }
-            stats.tweetsPosted += tweets.length;
+            stats.tweetsPosted += 1;
           }
           console.log(`  Investigation reply (${tweets.length} tweets): ${tweets[0]?.substring(0, 80)}...`);
           return;
