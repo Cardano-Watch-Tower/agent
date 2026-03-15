@@ -64,7 +64,7 @@ function loadDailyCounts() {
 
 function resetDailyCounts() {
   const today = new Date().toISOString().split('T')[0];
-  if (lastResetDate === today) return; // already reset today
+  if (lastResetDate === today && todayTargets !== null) return; // already reset today (but re-run if targets are null)
 
   lastResetDate = today;
   todayCounts = { follows: 0, reposts: 0, replies: 0 };

@@ -382,7 +382,19 @@ async function generateThought(context = {}) {
 
   const topic = topics[Math.floor(Math.random() * topics.length)];
 
-  const prompt = `${contextStr}Write a short, original tweet from CardanoWatchers on this topic: ${topic}
+  // Build data section if real alerts are available
+  let dataSection = '';
+  if (context.recentAlerts && context.recentAlerts.length > 0) {
+    const alerts = context.recentAlerts.slice(-3); // last 3
+    dataSection = '\nReal on-chain data you can reference:\n';
+    for (const a of alerts) {
+      const ada = a.totalMoved ? (a.totalMoved / 1e6).toFixed(1) + 'M ADA' : 'unknown amount';
+      dataSection += `- ${ada} moved (tx: ${a.txHash}) — link: cardanoscan.io/transaction/${a.txHash}\n`;
+    }
+    dataSection += '\nYou MUST reference real data above when writing. Include a cardanoscan.io link.\n';
+  }
+
+  const prompt = `${contextStr}${dataSection}Write a short, original tweet from CardanoWatchers on this topic: ${topic}
 
 Rules:
 - Pick the best personality mode for this topic (analyst, curious, philosopher, community, deadpan, watchdog, insider)
@@ -391,7 +403,7 @@ Rules:
 - Under 280 characters.
 - NO hashtags. Zero.
 - When possible, don't start with "I" or "We" — lead with the insight itself.
-- Make it worth pausing for. Not noise.
+- Make it worth pausing for. Not noise.${context.recentAlerts && context.recentAlerts.length > 0 ? '\n- You MUST include a cardanoscan.io/transaction/ link to a real tx from the data above. Do NOT invent tx hashes.' : '\n- This is a general observation. Do NOT reference specific transactions or make up data. Keep it philosophical or analytical about patterns you watch.'}
 
 Reply with ONLY the tweet text.`;
 

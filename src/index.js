@@ -123,6 +123,7 @@ async function chainWatchLoop() {
 
           for (const alert of alerts) {
             stats.alertsGenerated++;
+            recordAlert(alert);
             if (alert.totalMoved && alert.totalMoved > stats.largestMoveAda) {
               stats.largestMoveAda = alert.totalMoved;
               stats.largestMoveTx = alert.txHash;
@@ -514,6 +515,7 @@ async function thoughtsLoop() {
             blocksScanned: stats.blocksScanned,
             alertsGenerated: stats.alertsGenerated,
             largestMoveAda: stats.largestMoveAda > 0 ? stats.largestMoveAda : undefined,
+            recentAlerts: recentAlerts.length > 0 ? recentAlerts : undefined,
           };
 
           const thought = await generateThought(Object.keys(context).length > 0 ? context : {});
@@ -807,6 +809,23 @@ async function main() {
 
   process.on('SIGINT',  () => shutdown('SIGINT'));
   process.on('SIGTERM', () => shutdown('SIGTERM'));
+
+  // Catch unhandled errors — send Telegram before dying
+  process.on('unhandledRejection', async (reason) => {
+    const msg = 'Unhandled rejection: ' + (reason instanceof Error ? reason.message + '\n' + reason.stack : String(reason));
+    console.error('FATAL: ' + msg);
+    try { await messenger.sendTelegram('[CW CRASH] ' + msg.substring(0, 3900)); } catch(e) {}
+    saveStats();
+    process.exit(1);
+  });
+
+  process.on('uncaughtException', async (err) => {
+    const msg = 'Uncaught exception: ' + err.message + '\n' + err.stack;
+    console.error('FATAL: ' + msg);
+    try { await messenger.sendTelegram('[CW CRASH] ' + msg.substring(0, 3900)); } catch(e) {}
+    saveStats();
+    process.exit(1);
+  });
 
   // Run all loops concurrently
   Promise.all([
